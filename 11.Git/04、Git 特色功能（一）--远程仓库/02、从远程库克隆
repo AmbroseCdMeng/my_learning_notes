@@ -20,7 +20,7 @@
     F:\108.Notes>git remote add origin git@github.com:AmbroseCdMeng/my_learning_notes.git
 
 
-下一步，就可以把本地库中的内容推送到远程库中了
+下一步，就可以把本地库中的内容推送到远程库中了（在推送之前， 记得将本次仓库中的文件 add 并且 commit）
     git push -u origin master
 
     其中 git push 就是将本地库的内容推送到远程。
