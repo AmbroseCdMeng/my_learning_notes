@@ -1,0 +1,222 @@
+﻿2018年10月13日08:57:47
+
+/************************** 用户相关 ************************************/
+1、添加用户（一般企业环境下尽量避免直接使用root用户进行操作）
+     第一种方式：
+	[root@mode ~]# useradd mcd
+	[root@mode ~]# passwd mcd
+	Changing password for user mcd.
+	New UNIX password: 
+	BAD PASSWORD: it is too simplistic/systematic
+	Retype new UNIX password: 
+	passwd: all authentication tokens updated successfully.
+	[root@mode ~]#
+
+    第二种方式：(常用于脚本 --stdin 参数意为调用管道前面的字符串作为passwd的值)
+	[root@mode ~]# echo "123456"|passwd --stdin mcd
+	Changing password for user mcd.
+	passwd: all authentication tokens updated successfully.
+	[root@mode ~]# 
+
+2、查看当前用户
+	[root@mode ~]# whoami
+	root
+
+3、切换用户  (短杠 - 的作用是将环境变量和用户的配置文件也切换)
+	[root@mode ~]# su - mcd
+	[mcd@mode ~]$
+
+		这里发现一点：root 用户的命令提示符是 #	而普通用户的命令提示符是 $
+		普通用户切换到root用户是可以不写用户名，直接 su - 
+
+
+
+/************************** 系统更新 & 软件安装 ************************************/
+yum 命令是用来安装软件的。安装包为rpm包
+
+默认的获取rpm包的途径是CentOS官网的源（国外）
+
+1、切换yum源到国内（下载速度更快）
+	cd /etc/yum.repos.d/
+	mv CentOS-Base.repo CentOS-Base.repo.back		备份默认yum源
+	wget http://www.sohu.com/help/CentOS-Base-sohu.repo	下载搜狐的yum源或者网易的yum源 wget 							http://mirrors.163.com/.help/CentOS6-Base-163.repo
+	mv CentOS-Base-sohu.repo CentOS-Base.repo		覆盖Base文件（注意文件名）
+
+2、更新系统
+	yum upgrade
+
+3、安装软件 (多个软件用空格隔开	-y是不提示安装 )
+	yum install lrzse
+	yum install sysstat -y
+
+	安装完之后查看安装的软件	
+		rpm -qa	
+	        也可以接一个管道
+		rpm -qa|grep sysstat
+4、查看已经包装的包
+	yum grouplist
+	安装 yum groupinstall "base"
+
+/******************** 基本优化 ***************************/
+1、建议关闭 selinux
+	selinux 是 Linux 中的安全机制， 该功能的开启会导致很多操作的复杂化（例如安装软件时的各种不支持提示，网络配置无法访问等）
+
+	vi /etc/selinux/config	编辑配置文件
+	调整 SELINUX 为 disabled
+	
+	修改完成后重启生效
+
+	或者
+	setenforce 0 修改 SELINUX 的状态	这样修改只针对当前有效，重启后失效
+
+	★ 建议同时使用上述两种方法修改 可以达到服务器不论重启与否，该修改都是生效的
+	
+2、运行级别（Linux 有 7 个运行级别）
+	查看当前运行级别：（级别 3 是字符环境）
+		[root@mode ~]# runlevel
+		N 3
+
+	查看运行级别：
+		cat /etc/inittab
+
+		# Default runlevel. The runlevels used by RHS are:
+		#   0 - halt (Do NOT set initdefault to this)
+		#   1 - Single user mode
+		#   2 - Multiuser, without NFS (The same as 3, if you do not have networking)
+		#   3 - Full multiuser mode
+		#   4 - unused
+		#   5 - X11
+		#   6 - reboot (Do NOT set initdefault to this)
+		# 
+		id:3:initdefault:
+
+	级别描述：
+		0：关机状态
+		1：单用户模式（可以用于破解密码）
+		2：没有NFS的多用户模式
+		3：字符和文本界面
+		4：未使用
+		5：图形化界面
+		6：重启	（init 6 相当于 reboot）
+
+3、优化开机启动服务
+        方法一：
+	setup	调出图形窗口
+	选择system services
+	把不需要启动的项去掉星号即可
+
+        方法二：
+	ntsysv	直接调出services窗口
+
+        ☆ 常用的服务：
+	crond：定时任务
+	network：网络
+	sshd：ssh服务（srt连接Linux）
+	syslog：系统日志
+	
+        ★ 查看配置：
+	chkconfig --list			查看所有
+	chkconfig --list|grep 3:on		查看运行级别3下开启的服务
+
+
+4、权限管理 sudo（root用户操作）
+	打开权限配置文件：
+		visudo	相当于 vi /etc/sudoer		△扩展   :set nu 	打开文本编辑的行号
+						            yy		复制一行
+						            p		粘贴
+		★ 建议使用visudo，虽然与 vi /etc/sudoer 效果相同，但visudo会有语法识别，如果配置文件语法错误会有警告，而直接修改文件不会提示语法问题。
+	权限配置格式：（无角色名时相当于root角色）
+		root	ALL=(ALL)		ALL
+		（逗号+空格 隔开	需要命令的完整路径）
+
+	例如：
+		mcd 	ALL=(ALL)   /usr/sbin/useradd, /usr/sbin/userdel		★ 注意 目录 usr 而不是 user
+		mcd用户在所有机器拥有所有角色，可以进行角色添加/删除操作
+
+	切换到mcd用户下，执行超过自身权限的操作（即sudo中追加的权限时），需要使用sudo命令
+	[root@mode //]# su - mcd
+	[mcd@mode ~]$ sudo useradd test
+
+	We trust you have received the usual lecture from the local System
+	Administrator. It usually boils down to these three things:
+
+   	 #1) Respect the privacy of others.
+    	#2) Think before you type.
+   	 #3) With great power comes great responsibility.
+
+	[sudo] password for mcd:
+	[mcd@mode ~]$ id test
+	uid=501(test) gid=501(test) groups=501(test) context=root:system_r:unconfined_t:SystemLow-SystemHigh
+	
+	
+	查询权限：sudo -l	
+	[mcd@mode ~]$ sudo -l
+	[sudo] password for mcd
+	Matching Defaults entries for mcdon this host:
+    	requiretty, !visiblepw, env_reset, env_keep="COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR
+   	 LS_COLORS MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION
+    	LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL
+    	LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY"
+
+	Runas and Command-specific defaults for mcd:
+
+
+	User mcdmay run the following commands on this host:
+  	  (ALL) /usr/sbin/useradd, (ALL) /usr/sbin/userdel
+
+	查询命令所在路径：root 用户下 which	通过root的环境变量去查询完整路径
+	[root@mode ~]# which useradd
+	/usr/sbin/useradd
+
+5、环境变量
+	查看当前用户的环境变量：echo $PATH
+	[mcd@mode ~]$ echo $PATH
+	/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/home/mcd/bin
+
+	修改当前用户的环境变量：
+	vi .bash_profile
+		环境变量用冒号分割	修改完成后保存重新加载
+	source .bash_profile	或者   . .bash_profile		（这里第一个点相当于soure 重新加载）
+
+6、SSH服务优化
+	Windows 的超级管理员用户 administrator		连接端口 3389
+	Linux的超级管理员用户 root			连接端口 22
+
+	优化目标：
+		改掉默认的普通用户和默认端口， 防止攻击
+
+	步骤：
+	[root@mode ~]# cd /etc/ssh/
+	[root@mode ssh]# ll
+	total 204
+	-rw------- 1 root root 132839 Feb 23  2012 moduli
+	-rw-r--r-- 1 root root   1836 Feb 23  2012 ssh_config
+	-rw------- 1 root root   3332 Feb 23  2012 sshd_config
+	-rw------- 1 root root    668 Sep 18 19:38 ssh_host_dsa_key
+	-rw-r--r-- 1 root root    590 Sep 18 19:38 ssh_host_dsa_key.pub
+	-rw------- 1 root root    963 Sep 18 19:38 ssh_host_key
+	-rw-r--r-- 1 root root    627 Sep 18 19:38 ssh_host_key.pub
+	-rw------- 1 root root   1671 Sep 18 19:38 ssh_host_rsa_key
+	-rw-r--r-- 1 root root    382 Sep 18 19:38 ssh_host_rsa_key.pub
+
+	发现有两个 config 的配置文件：
+		其中ssh_config是客户端的配置文件，这里客户端指的是我们SCRT
+		而   sshd_config是服务端的配置文件，才是我们要改的文件
+		
+	例如：我们修改以下参数：
+		Port 52000		# 默认22，一般修改为其他值
+		PermitRootLogin no		# 禁止root用户远程登录
+		PermitEmptyPasswords no	# 禁止空密码登录
+		UserDNS no		# 禁止使用DNS
+
+	重启ssh服务：
+		/etc/init.d/sshd restart
+	有可能需要关闭防火墙：
+		/etc/init.d/iptables stop
+
+	查看当前连接状态：
+		netstat -an
+	或者可以过滤一下：
+		netstat -an|grep -i est
+	查看具体连接用户：
+		w

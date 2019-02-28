@@ -1,0 +1,95 @@
+﻿2018年9月29日19:58:35
+
+**********************************************************************************************
+SSH ：Secure Shell
+	传统的网络服务程序  ftp 和 telnet 在本质上都是不安全的，因为他们在网络上用明文传送口令和数据，容易被人截获
+	而通过SSH客户端和服务端进行通讯时。用户名和口令都进行了加密，有效的防止了对口令的窃听。
+	同时SSH的数据传输是经过压缩的，所以可以提高数据的传输速度。
+
+SSH 安装包和注册机本地路径	D:\SecureCRT_win_7.3
+SSH 客户端本地路径		E:\SecureCRT\SecureCRT.exe
+
+SSH 注册机使用	
+	注册机激活步骤如下： 
+1）安装SecureCRT。 
+2）保持SecureCRT软件关闭。
+3）打开注册机； 
+4）点击【Patch】按钮，会让你选择文件 ，选择SecureCRT安装目录下的SecureCRT.exe，再提示一次选择LicenseHelper,确定后都会提示成功信息。 
+5）然后打开CRT软件，下一步跳过第一个要输东西的界面，进入新界面按照相应的提示输入注册机上显示的信息。激活成功！ 
+
+***********************************************************************************************
+
+配置链接
+  1、左上角 --> 快速连接
+  2、选择协议	SSH2
+  3、主机名	IP地址	192.168.92.128		查看Linux 的IP 		ip add
+  4、端口		22	SSH的对应端口为 22
+  5、查看是否开启服务端 SSH 服务	即Linux虚拟系统的 SSH 服务  -->  netstat -Intup|grep 22
+  6、用户名	root	密码 	123456
+  7、可能会出现The host key database does not contain……的警告  选择 accept and save， 然后重新输入用户名密码即可
+
+★ 常见链接错误处理
+  1、连接到会话***超时 
+	检查Linux和PC机的连接是否正常 	ping 一下 Linux 的 IP 地址	链接参考文章 https://jingyan.baidu.com/article/75ab0bcbbbc630d6874db279.html
+  2、远程系统拒绝连接问题
+	检查Linux系统CRT服务的默认端口 22 是否开启 或者 是否被修改为其他端口  ping IP地址 端口号
+	检查Linux系统端CRT服务是否打开？见配置第 5 步
+	检查Linux系统端和PC端的防火墙是否禁止了CRT端口 	iptables
+
+
+调整终端和缓冲区
+	选项 Options -->  会话设置 Session Options --> 终端 Terminal  -->  Emulation 仿真 -->  
+	(右)终端 Termianl  更改为  Xterm	*** 常用配置
+	勾选  ANSI颜色 ANSI Color		*** 一般人的习惯 黑色
+	回滚缓冲区 Scrollback buffer  更改为 32000（最大）		*** 操作区的回滚长度  可以看到之前执行的命令和结果（最多）
+	
+	同上--终端下  -->  Appearance 外观  -->  调整字体  颜色等
+
+	选项 Options -->  全局设置  Global Options
+
+	设置日志文件保存到 D:\VM-Files\SSH-log  文件夹  	D:\VM-Files\SSH-log\%S-%Y-%M-%D.log
+		文件名 为  会话名+年与日             追加到文件
+		配置完后后重启会话   
+			Ctrl + D  注销当前用户
+			Enter  登录
+
+
+配置SCRT中上传下载文件的路径
+	会话设置 -->  XYZmodem
+	D:\VM-Files\CentOS-5.8
+
+
+★ 上传文件
+	配置好路径之后。上传文件的命令是  rz
+		BUT   这个命令默认是不存在的
+
+	所以需要安装这个软件
+	
+	Linux 中 安装软件的命令 
+		yum install lrzsz	如果 -y 参数  意思是后台安装  不提示
+			☆ 该命令在CentOS6中执行成功，但是在5.8中报错
+
+	2018年10月7日14:17:45 	5.8版本下yum源依旧有问题 
+		参考文章   https://blog.csdn.net/guizishou00/article/details/79498704
+			https://blog.csdn.net/qq_26710805/article/details/80273790
+
+
+上传文件 rz 命令 
+	默认打开的是SCRT中设置的Upload窗口
+	默认上传到Linux服务器上当前所在的目录
+
+下载文件 sz 命令
+	默认到SCRT中设置的Download路径
+
+★ 这个命令是Linux命令 但用于Windows机与虚拟Linux远程服务器之间互传文件  
+	在真实Linux机器上是无法单独使用的
+
+
+
+多窗口批量执行命令(多服务器之间)
+		批量管理的前提  	在一个窗口中打开需要批量管理的标签
+	View(查看) -->  Command(Chat) window (交谈窗口)  	选中之后会发现CRT下面弹出一个新的对话框
+
+	在新对话框中右键  选中将交谈发送到所有标签 send Command to all session
+	然后继续执行命令行 就会发现所有的标签执行同样的命令
+

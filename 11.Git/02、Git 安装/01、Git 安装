@@ -1,0 +1,28 @@
+2019年2月25日10:25:08
+
+
+Linux 上安装 Git
+
+    直接输入 git 命令。 如果已经安装， 会直接打开 git。
+
+    如果没有安装， 大多数 Linux 版本会提示 git 的安装命令。
+        大多数版本：sudo apt-get install git
+        部分老版本：sudo apt-get install git-core
+        其它的版本：通过源码安装。 Git 上下载源码后依次执行 --> ./config --> make --> sudo make install
+
+Windows 上安装 Git
+
+    Git 官网下载安装程序。      https://git-scm.com/downloads
+    
+    安装完成后，在“开始”菜单中找到 Git --> Git Bash 打开即可。
+
+
+
+安装完成后，需要进行配置
+    $ git config --global user.name "Your name"
+    $ git config --global user.email "Your email"
+
+因为 Git 是分布式的。所以使用 Git 都必须设置自己的用户名和邮箱
+
+注意上面 $ git config --global 的配置表示本地配置， 即本机器上的所有 Git 仓库都使用这个配置。
+如果需要对某个仓库进行单独的配置， 需要单独执行

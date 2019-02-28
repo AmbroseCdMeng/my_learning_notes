@@ -1,0 +1,148 @@
+2018年10月11日10:53:59
+
+pyquery 是 python 常用的HTML解析库之一
+
+和BeautifulSoup相似。pyquery也需要传入HTML文本来初始化pyquery对象
+它的初始化方式有很多种。直接传入字符串、传入URL、传入文件名、等等
+
+1、字符串初始化
+    html =  ''' 
+            <div>
+                <ul>
+                    <li class="item-0">first item</li>
+                    <li class="item-1"><a href="link2.html">second item</a></li>
+                    <li class="item-0 active"><a href="link3.html"><span class="bold">third item</span></a></li>
+                    <li class="item-1 active"><a href="link4.html">fourth item</a></li>
+                    <li class="item-0"><a href="link5.html">fifth item</a></li>
+                </ul>
+            </div>
+            '''
+    from pyquery import PyQuery as pq
+    doc = pq(html)          # 解析HTML字符串
+    print(doc('li'))        # 输出所有的li节点
+
+2、URL初始化
+    from pyquery import PyQuery as pq
+    doc = pq(url = 'http://www.baidu.com')      # 解析器会自动请求url参数中的地址 获取HTML内容并完成初始化
+    print(doc('title'))
+
+    其结果等同于
+    import requests
+    doc = pq(requests.get('http://www.baidu.com').text)
+
+3、文件初始化
+    from pyquery import PyQuery as pq
+    doc = pq(filename = 'test.html')            # 解析器会自动读取filename参数中的html文件 将其内容以字符串形式传递给PyQuery解析
+    print(doc('li'))
+
+
+基本CSS选择器(写法与JQuery类似)
+
+    from pyquery import PyQuery as pq
+    doc = pq(url = 'http://www.baidu.com')
+    print(doc('#container .list li'))           # 获取id为container的节点 取其内class为list的节点 内的li节点    返回的类型依旧是PyQuery
+
+查找节点
+
+    from pyquery import PyQuery as pq
+    doc = pq(url = 'http://www.baidu.com')      # 解析后的结果doc 与 其 find 等方法返回的类型都为 <class 'pyquery.pyquery.PyQuery'>
+    print(doc.find('li'))
+    print(doc('.list'))
+    print(doc('.list').find('li'))
+
+        类似find的方法还有：
+            find()：查找指定条件的所有子孙节点
+            children()：查找指定条件下的子节点
+            parent()：查找指定条件下的父节点
+            parents()：查找指定条件下的祖先节点
+            siblings()：查找指定条件下的兄弟节点
+
+遍历：我们发现pyquery的选择节点如果有多个结果时，并不是想BeautifulSoup那样返回一个列表，而是和单个结果一样都返回的是PyQuery类型
+
+    对于单个节点，可以直接打印输出，也可以转成str输出
+        from pyquery import PyQuery as pq
+        doc = pq(url = 'www.baidu.com')
+        li = doc('.item')
+        print(li)
+        print(str(li))
+
+    对于多个节点，可以调用items()方法后对其进行遍历
+        from pyquery import PyQuery as pq
+        doc = pq(url = 'www.baidu.com')
+        list = doc('li').items()
+        print(type(list))                       # 可以发现 调用items()方法后会得到一个迭代器 可以直接遍历
+        for li in list:
+            print(li, type(li))                 # 遍历得到的每一个节点对象依然是PyQuery类型
+
+
+获取属性：
+    PyQuery类型的节点，拥有attr()方法来获取属性
+        ……
+        print(doc.attr('href'))                 # 输出当前获取到的节点的href属性值
+
+    同上，PyQuery类型的节点也拥有attr属性
+        ……
+        print(doc.attr.href)                    # 输出当前获取到的节点的href属性值
+
+    当结果包含多个节点时，这种情况下调用attr()方法时，只会得到第一个节点的属性。
+    此时，再想获取所有节点的href属性，就需要对节点集进行遍历，然后依次获取其href值。
+
+获取文本：
+    PyQuery类型的节点，拥有text()方法来获取节点内的文本
+    此时，它会忽略当前获取到的节点中所有的HTML，只返回纯文本内容
+
+获取HTML文本：
+    同上，可以使用html()方法获取节点的HTML文本
+
+    ★ 值得注意的是：
+        当结果为多个节点时。
+            html()方法与attr()方法返回的时获取到的节点集合的第一个节点的HTML文本和属性
+            text()方法返回了节点集合中所有节点内部的纯文本，中间用空格隔开。也就是说，其返回的是一个合并了所有结果的字符串
+
+节点操作：
+    addClass('class_name')                      # 添加class属性
+    removeClass('class_name')                   # 移除class属性
+
+        from pyquery import PyQuery as pq
+        doc = pq(html)
+        li = doc('.item-0.active')
+        print(li)
+        li.removeClass('active')                # 移除选中节点名为active的class
+        print(li)
+        li.addClass('test')                     # 添加选中节点名为test的class
+        print(li)
+    
+        <li class="item-0 active"><span>item1</span></a></li>
+        <li class="item-0"><span>item2</span></a></li>
+        <li class="item-0 test"><span>item3</span></a></li>
+
+    ☆ 可以看出，这两个方法其实就是相当于动态的改变节点的class属性
+
+    类似的方法还有：
+        attr('name', 'value')                   # 设置选中节点的name属性的值为value
+        text('change_text')                     # 设置选中节点的文本内容为change_text
+        html('<span>item5</span>')              # 设置选中节点的HTML文本内容为<span>item5</span>
+
+        remove()                                # 移除指定节点信息
+        append()                                # 加入指定节点信息
+    例如：
+        html = '''
+            <div class="wrap">
+                Hello, World
+                <p>This is a paragraph.</p>
+            </div>
+        '''
+        from pyquery import PyQuery as pq
+        doc = pq(html)
+        wrap = doc('.wrap')
+        print(wrap.text())                      # Hello, World This is a paragraph.
+        wrap.find('p').remove()
+        print(wrap.text())                      # Hello, World
+
+伪类选择器
+        doc = pq(html)
+        li = doc('li:first-child')              # 第一个li节点
+        li = doc('li:last-child')               # 最后一个li节点
+        li = doc('li:nth-child(2)')             # 第二个li节点
+        li = doc('li:gt(2)')                    # 第三个li节点之后的所有li节点
+        li = doc('li:nth-child(2n)')            # 第偶数个li节点

@@ -1,0 +1,31 @@
+﻿2018年10月1日12:27:30
+
+/*******  WEB库的安装  ********/
+
+1、Flask 的安装
+	轻量级的web服务程序
+	pip3 install flask
+
+    测试：
+>>> from flask import Flask
+>>> app = Flask(__name__)
+>>> @app.route("/")
+... def hello():
+...     return "Hello World"
+...
+>>> if __name__ == "__main__":
+...     app.run()
+...
+ * Serving Flask app "__main__" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+127.0.0.1 - - [01/Oct/2018 12:21:02] "GET // HTTP/1.1" 301 -
+127.0.0.1 - - [01/Oct/2018 12:21:02] "GET / HTTP/1.1" 200 -
+
+2、Tornado 安装
+	支持异步的Web框架，通过使用非阻塞的I/O流，可以支撑成千上万的开放连接，效率非常高
+	pip3 install tornado
+	

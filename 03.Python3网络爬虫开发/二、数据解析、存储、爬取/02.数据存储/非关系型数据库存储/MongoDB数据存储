@@ -1,0 +1,150 @@
+2018年10月18日9:00:50
+
+    数据存储 -- 非关系型数据库存储 -- MongoDB数据存储
+
+Not Only SQL 简称：NOSQL。泛指非关系型数据库。
+    NOSQL 是基于键值对的。而且不需要经过SQL层的解析，数据之间没有耦合性，性能非常高。
+
+非关系型数据库可以细分如下：
+    键值存储数据库：Redis、Voldemort、Oracle BDB等
+    列存储数据库：Cassandra、HBase、Riak等
+    文档型数据库：CouchDB、MongoDB等
+    图形数据库：Neo4J、InfoGrid、Infinite Graph等
+
+使用关系型数据库存储数据需要提前创建表， 而且如果数据之间存在嵌套关系的话，需要进行序列化操作才可以存储。
+而非关系性数据库可以避免一些类似的麻烦，在这种情况下更加简单高效。
+
+**************************************************************************************
+
+MongoDB 是由C++语言编写的非关系型数据库，是一个基于分布式文件存储的开源数据库系统。
+    其内容存储形式类似于JSON对象，字段可以包含其他文档、数组即文档数组。
+
+
+    需要导入 pymongo 库
+    ▲ 默认端口：27017
+
+
+建立数据库连接
+    import pymongo
+    client = pymongo.MongoClient(host = 'localhost', port = 27017)      # 传入参数 地址、端口（端口不传时默认27017）
+    client = pymongo.MongoClient('mongodb://localhost:27017/')          # 或者直接传入 mongodb 开头的特定连接字符串
+
+
+连接数据库实例
+    db = client.db_test             # 直接调用client的数据库实例
+    db = client['db_test']          # 同上。效果相同
+
+
+连接指定集合（MongoDB的每个数据库中包括多个集合。所谓集合，类似于关系型数据库中的表）
+    collection = db.students        # 直接调用db的集合
+    collection = db['students']     # 同上。效果相同
+
+
+插入数据
+    student = {'id':'201810', 'name':'Bob', 'age':20}       # 构造一条字典形式的数据
+    result = collection.insert(student)         # 调用collection的 insert 方法插入数据
+    print(result)                   # 输出该条数据  会发现返回一个 ID 值。
+                                    # 该值是 MongoDB 中数据的唯一标识码。如果没有手动指定，则会自动为每条数据生成一个 ObjectID 类型的 _id 属性并在insert()之后返回
+
+    ☆ 插入多条数据时
+    可以构造多个如上的 student 并以列表的形式作为参数传递给 insert() 方法即可。返回的应该是 id 的集合
+
+    ★ 在新版本的 MongoDB 中。推荐使用 insert_one() 和 insert_many() 方法分别来插入单条记录和多条记录
+    与 insert() 方法不同的是：insert_one() 和 insert_many() 方法返回值分别是 InsertOneResult 和 InsertManyResult 对象
+    如果需要获取其 id 值，需要调用该对象的 inserted_id 或者 inserted_ids 属性。
+
+
+查询数据
+    result = collection.find_one({'name':'Bob'})        # 查询 name 为 Bob 的第一条数据，返回字典类型(会包含自动生成的_id属性)
+    results = collection.find({'age':20})        # 查询 age 为 20 的所有数据，返回 Cursor 类型的生成器，可以遍历输出，其中每个结果都是字典类型
+    for item in results:
+        print(item)
+
+    ▲ 可以看出，查询的条件参数实际上是一个字典形式。
+        
+        但如果是其它比较符号，这里查询条件键值也会是一个字典形式，其中键为比较符号，值为比较值
+        如下：
+            $lt     小于                例：{'age':{'$lt', 20}}             # age 小于20
+            $gt     大于        
+            $lte    小于等于
+            $gte    大于等于
+            $ne     不等于
+            $in     在范围内            例：{'age':{'$in', [20, 23]}}       # age 在20~23之间
+            $nin    不在范围内 
+            
+            $regex  正则匹配            例：{'name':{'$regex', '^B.*$'}}    # name 以 B 开头
+            $exists 属性是否存在        例：{'name':{'$exists':True}}       # name 属性存在
+            $type   类型                例：{'age':{'$type', 'int'}}        # age 类型为 int
+            $mod    数字模操作          例：{'age':{'$mod':[5, 0]}}         # age 与 5 的模 为 0
+
+            $text   文本查询            例：{'$text': {'$search': 'Mike'}}  # text类型的属性包含Mike字符串
+            $where  高级条件查询        例：{'$where': 'obj.fans_count == obj.follows_count'}       # 自身粉丝数等于关注数
+
+    以上 find() 返回的 Cursor 类型数据
+    ☆ count() 方法统计数据的条数
+        count = collection.find({'age':20}).count()     # age 为 20 的记录的条数
+
+排序
+    ☆ sort() 方法对结果排序排序
+        results = collection.find().sort('name', pymongo.ASCENDING)     # 按照 name 属性升序排列（降序：DESCENDING）
+        print([result['name'] for result in results])
+
+偏移
+    skip()方法对结果进行偏移。比如skip(2)，就会忽略前两个元素，返回第3个及以后的元素
+        results = collection.find().sort('name', pymongo.ASCENDING).skip(2)
+
+    limit()方法指定选取的结果个数
+        result = collection.find().sort('name', pymongo.ASCENDING).skip(2).limit(3)     # 忽略前两个元素 从第三个开始返回两个元素
+        
+
+更新数据
+    update() 直接更新
+        condition = {'name', 'Bob'}                         # 查询条件
+        student = collection.find_one(condition)            # 查询结果
+        student['age'] = 25                                 # 修改参数
+        result = collection.update(condition, student)      # 修改数据
+        
+        返回结果如下（字典形式）：
+            {'ok': 1, 'nModified': 1, 'n': 1, 'updatedExisting': True}
+                # ok： 执行成功
+                # nModified：影响的行数
+
+    $set 操作符 + update() 对数据进行更新
+        result = collection.update(condition, {'$set':student})
+            ★ 与直接使用 update() 更新的区别：
+                使用 $set 操作符， 这样只会更新 student 字段内存在的字段。如果原先还有其它字段，不会更新也不会删除
+                不适用 $set 操作符， 则会把之前的数据全部用 student 字典替换掉， 原本存在的其它字段也会被删除
+
+    与查询方法类似：
+        更新方法也有 update_one() 和 update_many() 两个方法
+        这两个方法用法更加严格，它们的第二个参数需要使用 $ 类型操作符作为字典的键名， 而不能直接传入修改后的字典。
+        其返回的结果是 UpdateResult 类型。然后可以分别调用 matched_count 和 modified_count 方法来获取匹配的条数和影响的行数
+
+        与 $set 类似的操作符还有 $inc :代表+1 等等...
+
+        例如：对于年龄大于 20 的人 对其年龄进行 +1 操作
+            condition = {'age': {'$gt': 20}}
+            result = collection.update_one(condition, {'$inc': {'age': 1}})     # 只会对第一条符合条件的记录进行更新 如果要更新所有 需要update_many
+            print(result)
+            print(result.matched_count, result.modified_count)
+        
+
+删除数据
+    remove() 直接删除
+        result = collection.remove({'name', 'Bob'})
+
+        同样：
+            删除方法也有 delete_one() 和 delete_many()      ★★★ 这里是 delete 而不是 remove 了
+            它们返回的结果都是 DeleteResult 类型， 可以调用 deleted_count 属性来获取删除的数据的条数
+
+
+扩展方法
+    另外， Python 还提供了一些组合方法。
+        如下：
+            find_one_and_delete()
+            find_one_and_replace()
+            find_one_and_update()
+
+            create_index()
+            create_indexes()
+            drop_index()

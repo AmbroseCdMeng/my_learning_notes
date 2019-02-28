@@ -1,0 +1,43 @@
+﻿2018年10月1日12:28:23
+
+/*******  APP爬取相关库的安装  ********/
+
+	用来爬取APP的数据，APP没有浏览器这种可以比较直观的看到后台请求的工具，所以主要用一些抓包技术来抓取数据
+
+1、Charles 库
+	是一个强大的网络抓包工具，跨平台支持性好，常用作移动端抓包工具
+
+	下载地址： https:www.charlesproxy.com/download
+	★ 这是个收费软件
+	    可以免费试用30天，试用期过后，每次可以使用30分钟，每次启动有10秒延迟
+
+	证书配置
+	Charles  
+		Help -->  SSL Proxying -->  install charles root certificate   即可进入安装证书页面
+
+	指定证书放入以下存储    受信任的根证书颁发机构
+
+
+2、mitmproxy 库
+	支持HTTP 和HTTPS 的抓包程序，功能与 Fiddler  Charles 类似 
+	只不过它是通过控制台的形式操作
+	pip3 install mitmproxy
+
+	同样需要证书配置
+	mitmdump	命令产生CA证书 并启动 mitmdump
+
+3、Appium 库
+	移动端的自动化测试工具，利用它可以驱动 Android IOS等设备完成自动化测试，如模拟点击、滑动、输入等操作
+
+	安装 ： https://github.com/appium/appium-desktop/releases
+
+	使用这个需要先安装node.js
+
+	Node JS  安装完成后 使用 
+		npm install -g appium 命令全局安装即可
+			出现警告 gyp 命令不支持 3.0 以上的Python
+
+
+4、Android 开发环境配置
+	使用Android设备作为APP抓取还需要安装Android SDK 
+	推荐直接使用Android Studio

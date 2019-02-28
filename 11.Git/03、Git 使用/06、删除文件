@@ -1,0 +1,17 @@
+2019年2月26日21:37:21
+
+
+删除文件
+
+
+在 Git 中，删除文件也属于修改操作
+
+当从本地，即工作区删除了一个文件后，执行 git status 命令时， git 会告诉你哪些文件已经删除了， 并给出提示操作
+    这时候，有两个选择：
+        1. 从版本库中删除该文件
+            git rm test.txt
+            git commit -m "remove test.txt"
+
+        2. 工作区中删错了，需要恢复
+            git checkout -- test.txt
+            

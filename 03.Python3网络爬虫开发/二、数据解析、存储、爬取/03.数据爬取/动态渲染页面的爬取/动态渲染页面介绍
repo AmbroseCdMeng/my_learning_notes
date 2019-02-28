@@ -1,0 +1,17 @@
+2018年11月6日14:28:45
+
+    数据爬取 -- 动态渲染页面的爬取 -- 基本介绍
+
+之前使用的 Ajax 数据分析爬取，其实就是 JavaScript 动态渲染页面的一种情况。
+这种情况，通过分析Ajax请求，我们依然可以借助 requests 和 urllib 库来实现数据获取。
+
+但是 JavaScript 动态渲染页面的方法除了 Ajax 之外还有很多种。如：
+    http://news.youth.cn/gn/    中国青年网
+        它的分页部分是由 JS 生成的，而并非原始 HTML 代码，其中也并不包含 AJAX 请求
+    http://echarts.baidu.com/demo.html#bar-negative     ECharts官网实例
+        其图形是经过 JavaScript 计算之后生成的
+    http://www.taobao.com   淘宝
+        虽然是由 Ajax 请求获取的数据，但是由于加密复杂，很难直接分析 Ajax 获取
+
+为了解决这些问题。就需要直接模拟浏览器运行。这样就可以真正的做到可见即可爬
+为此，Python 提供了 Selenium、Splash、PyV8、Ghost等库来模拟浏览器运行

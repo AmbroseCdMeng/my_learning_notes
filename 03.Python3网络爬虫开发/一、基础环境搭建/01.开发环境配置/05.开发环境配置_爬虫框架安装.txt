@@ -1,0 +1,50 @@
+﻿2018年10月1日16:15:03
+
+/*******  爬虫框架的安装  ********/
+
+1、pyspider 
+	一个国人编写的强大的网络爬虫框架
+	带有强大的WebUI、脚本编辑器、任务监控器、项目管理器、结果处理器，同时支持多种数据库后端，多种消息队列，还支持JavaScript渲染页面爬取
+	pip3 install pyspider
+	
+	windows下会出现 command python setup.py egg_info failed with error code 错误
+	这是需要手动安装 pycurl 的whl库
+		https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycurl
+
+	 	python3.7 32位  所以 pycurl-7.43.1-cp37-cp37m-win32.whl  ★ 3.7 的运行有BUG 作者暂未修复
+			所以本机又装了3.6
+	pip3 install pycurl-7.43.1-cp37-cp37m-win_amd64.whl
+
+	pyspider all 运行后 打开 http://localhost:5000/ 即可看到管理页面
+
+
+2、scrapy 
+	十分强大的爬虫框架
+	依赖的库也比较多
+
+
+    安装 lxml 之前已经安装过
+    安装 pyOpenSSL	地址: https://pypi.python.org/pypi/pyOpenSSL#downloads
+	pip3 install pyOpenSSL-18.0.0-py2.py3-none-any.whl
+    安装 twisted	地址: https://www.lfd.uci.edu/~gohlke/pythonlibs/#twisted	下载3.6 32位
+	pip3 install Twisted-18.7.0-cp36-cp36m-win32.whl
+    安装 pywin32	地址: https://sourceforge.net/projects/pywin32/files/pywin32/
+	本机安装了 3.6 版本的
+
+    ☆ 上述依赖库安装完成后
+    安装 scrapy
+	pip3 install scrapy
+
+3、安装 scrapy-splash
+	是一个scrapy中支持JS渲染的工具
+        splash服务安装
+	docker run -p 8050:8050 scrapinghub/splash
+		使用docker 命令前需要安装 Docker 	下载地址 https://github.com/boot2docker/windows-installer/releases
+	★ 这里安装docker可能会出现一些问题，见下一节Docker安装
+
+	★ 运行 docker 的同时，需要开启 Hyper-V 服务。
+	该组件（Hyper-V）与 一些软件 冲突，所以大多数情况下很可能是“卸载状态”的，需要在 控制面板 windows功能中 重新安装启用并重启计算机 然后重启服务
+
+4、pip3 install scrapy-splash
+
+5、pip3 install scrapy-redis

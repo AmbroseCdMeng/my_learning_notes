@@ -1,0 +1,45 @@
+2018年10月29日10:28:31
+
+    数据爬取 -- Ajax数据爬取 -- 基本介绍
+
+前言
+    request 抓取页面时，得到的结果可能与在浏览器中看到的不一样。
+    这是因为request获取的是原始的HTML文档，而浏览器中的页面展示的是经过JS处理数据后的结果。
+    这些数据的来源有多种，有可能是通过Ajax加载的，也可能是包含在HTML文档中后经过JS和特定的算法计算后生成的。
+
+    对于上述第一种来源。数据加载是一种异步加载方式，原始的页面最初不会包含这些数据，原始页面加载完毕后，会在向服务器请求某个接口获取数据，然后数据返回呈现到网页上。
+
+介绍
+    Ajax 全称 Asynchronous JavaScript and XML。即异步的 Javascript 和 XML。
+    它是利用JavaScript在保证页面不被刷新、页面链接不改变的情况下与服务器交换数据并更新部分网页的技术。
+
+基本原理
+    1、发送请求
+        AJAX 的底层 JS 原理：
+            var xmlhttp;
+            if (window.XMLHttpRequest) {
+                // code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp=new XMLHttpRequest();
+            } else {// code for IE6, IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange=function() {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                    document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+                }
+            }
+            xmlhttp.open("POST","/ajax/",true);
+            xmlhttp.send();
+
+        实际上，就是新建了XMLHttpRequest对象，然后调用 onreadystatechange 属性监听。
+        然后调用 open() 和 send() 方法向服务器发送请求。这里当服务器返回响应结果时，state就会改变，从而触发 onreadystatechange 方法。
+        然后再这个方法中解析响应内容。
+
+    2、解析内容
+        响应内容返回后。利用 xmlhttp 和 responseText 数据便可以获取到响应内容。返回的结果可能是 html，也可能是 json。
+        如果返回内容是 json 的话，还可以作进一步解析和转化。
+
+    3、渲染页面
+        解析完响应内容后，可以调用 JS 来针对解析完的内容对网页进行下一步处理。
+        即对 DOM 网页文档进行更改、删除等。
+    

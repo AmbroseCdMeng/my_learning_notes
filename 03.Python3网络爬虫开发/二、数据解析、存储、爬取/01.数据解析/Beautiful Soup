@@ -1,0 +1,71 @@
+2018年10月10日13:27:29
+
+Beautiful Soup 是 Python 常用的HTML解析库之一。
+其提供简单的Python式函数来处理导航、搜索、修改分析树等功能，通过解析文档为用户提供需要抓取的数据。
+
+Beautiful Soup 自动将输入的文档转换为Unicode编码，输出文档转换为UTF-8编码。
+
+Beautiful Soup 在解析时实际上依赖解析器，它除了支持Python标准库中的HTML解析器外，还支持一些第三方解析器
+    python 标准库       BeautifulSoup(markup, "html.parser")
+        Python 内置的标准库，执行速度适中，文档容错能力强
+        低版本的Python文档容错能力差
+    lxml Html 解析器    BeautifulSoup(markup, "lxml")
+        速度快，文档容错能力强
+        需要安装C语言库
+    lxml XML 解析器     BeautifulSoup(markup, "xml")
+        速度快，唯一支持XML的解析器
+        需要安装C语言库
+    html5lib            BeautifulSoup
+        最好的容错性，以浏览器的方式解析文档，生成HTML5格式的文档
+        速度慢，不依赖外部扩展
+
+例：使用lxml解析库初始化BeautifulSoup       ★ 需要先install lxml库
+
+        from bs4 import BeautifulSoup
+        html = '''<p class="title" name="test">Hello</p>'''
+
+        soup = BeautifulSoup(html, 'lxml');                 # 声明html字符串 并不一定是完整的闭合HTML
+        print(soup.prettify())                              # 以标准的缩进格式输出 自动更正格式
+        print(soup.p)                                       # 输出节点内容          <p class="title" name="test">Hello</p>
+        print(soup.p.string)                                # 调用节点名称的string属性 输出节点内的文本     Hello
+        print(soup.p.name)                                  # 获取节点名称          p
+        print(soup.p.attr)                                  # 获取节点的所有属性    {'class': ['title'], 'name': 'dromouse'}
+        print(soup.p.attr['name'])                          # 获取节点的指定属性    test
+        print(soup.p['name'])                               # 获取节点的指定属性    test 
+
+        print(soup.head.body.p)                             # 可以嵌套获取节点
+        print(soup.p.children)                              # children属性获取指定节点的子节点
+                                                            # 类似的属性还有     contents：获取直接子节点的列表形式
+                                                                                children：获取直接子节点 返回生成器
+                                                                                descendants：获取所有子孙节点
+                                                                                parent：父节点
+                                                                                parents：祖先节点
+                                                                                next_sibling：下一个兄弟节点
+                                                                                previous_sibling：上一个兄弟节点
+                                                                                next_siblings/previous_sibling：后面/前面的所有兄弟节点
+
+    ★  方法选择器 可以传入节点名、属性、文本等作为条件
+        find_all(name, attrs, recursive, text, **kwargs)    
+        
+        for ul in soup.find_all(name = 'ul'):
+            for li = ul.find_all(name='li'):                            # 获取所有的ul节点中的li节点
+                print(li.string)
+
+        print(soup.find_all(name = 'li', attr = {'id':'test'}))         # 获取所有id属性值为test的li节点   
+
+        print(soup.find_all(text = re.compile('link')))                 # 根据文本获取 传入的text可以是字符串或者正则表达式对象
+
+    类似 find_all 的方法还有：
+        find()：返回查找到第一个符合条件的元素
+        find_parent()/find_parents()：返回直接父节点/所有祖先节点
+        find_next_sibling()/find_next_siblings()：返回后面第一个兄弟节点/后面所有兄弟节点
+        find_previous_sibling()/find_previous_siblings()：返回前面第一个兄弟节点/前面所有兄弟节点
+        find_next()/find_all_next()：返回当前节点后第一个满足条件的节点/当前节点后所有满足条件的节点
+        find_previous()/find_all_previous()：返回当前节点前第一个满足条件的节点/当前节点前所有满足条件的节点
+
+    ★  CSS选择器
+        select()
+
+        print(soup.select('ul li'))                     # 选择ul节点下所有li节点    返回的是列表    
+        print(soup.select('#list-2 .element'))
+        print(type(soup.select('ul')[0]))               # 列表中元素依然是tag类型

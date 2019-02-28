@@ -1,0 +1,50 @@
+﻿2018年8月26日14:35:29
+
+搭建Linux系统环境（虚拟）
+
+    1、PC机不支持虚拟64位的情况处理
+
+	安装64位虚拟系统时，有可能会出现
+		your cpu not support long mode. use a 32bit distribution.
+	的错误信息
+
+	导致原因：
+		有的PC机默认设置虚拟技术不支持64位
+
+	解决方法：
+		PC机的 BIOS 设置。
+		Configuration或Security --> Intel Virtual Technology 选项修改为 Enabled 即可
+		（部分品牌PC机的该设置在CPU设置中）
+		
+
+    2、硬盘分区
+	
+	硬盘分区可以分为  主分区、扩展分区、逻辑分区
+		主分区至少1个
+		主分区和扩展分区最多4个
+		扩展分区不可以直接使用
+		超过五个必须要有一个扩展分区，扩展分区要使用需要在扩展分区上再分逻辑分区
+		主分区和扩展分区编号1~4
+		逻辑分区编号从5开始
+
+    3、网络配置
+	命令：network
+	Linux  5 版本中第一块网卡叫做 eth0
+
+
+	先重启网卡
+	etc/init.d/network restart	
+
+
+	查看网卡配置
+	ifconfig  ★		☆ WINDOWS 下命令是 ipconfig   Linux 中是 ifconfig  ★★★★★
+
+	查看系统基本信息的命令
+	cat /etc/redhat -release	系统版本
+	uname -r			系统内核
+	uname -m			系统位数
+	uname -a			基本信息
+	yum grouplist			已安装的包（需要先配置yum）
+	yum upgrade			更新系统到最新
+
+

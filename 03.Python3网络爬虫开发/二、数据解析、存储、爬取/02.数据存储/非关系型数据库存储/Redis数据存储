@@ -1,0 +1,97 @@
+2018年10月26日16:23:35
+
+    数据存储 -- 非关系型数据库存储 -- Redis数据存储
+
+Redis 是一个基于内存的高效的键值型非关系型数据库，存取效率极高，而且支持多种存数数据结构。
+
+    需要导入RedisPy库   如果需要导入/导出数据的功能，还需要安装 RedisDump 库
+    ▲ 默认端口：6379
+    
+    需要使用到 StrictRedis 类
+
+
+创建连接
+    方式一：
+        from redis import StrictRedis
+
+        redis = StrictRedis(host = 'localhost', port = 6379, db = 0, password = 'root')
+        redis.set('name', 'Bob')        # 设置(存储)一个键值对        设置并输入成功则说明成功连接数据库
+        print(redis.get('name'))        # 输出结果：b'Bob'
+
+    方式二：
+        from redis import StrictRedis, ConnectionPool
+
+        pool = ConnectionPool(host = 'localhost', port = 6379, db = 0, password = 'root')
+        redis = StrictRedis(Connection_pool = pool)     # 这种连接效果和方式一是一样的
+
+    方式三：
+        # url = 'redis://[:password]@host:port/db'
+        # url = 'rediss://[:password]@host:port/db'
+        # url = 'unix://[:password]@/path/to/socket.sock?db=db'
+        url = 'redis://root@localhost:6379/0'
+        pool = ConnectionPool.from_url(url)
+        redis = StrictRedis(Connection_pool = pool)
+
+
+键的操作
+
+    exists(name)        判断一个键是否存在          name：键名              # redis.exists('name')              True
+    delete(name)        删除一个键                                                                             1
+    type(name)          判断键的类型                                                                           b'string'
+    keys(pattern)       匹配符合规则的键            pattern：匹配规则       # redis.keys('n*')                  获取所有以 n 开头的键
+    randomkey()         随机获取一个键
+    rename(src, dst)    重命名一个键                src：原名；dst：新名                                        True
+    dbsize()            获取当前数据库中键的个数
+    expire(name, time)  设定键的过期时间            time：秒
+    ttl(name)           获取键的过期时间            -1：永不过期
+    move(name, db)      移动指定建到其它数据库
+    flushdb()           删除当前数据库中所有键
+    flushall()          删除所有数据库中所有键
+
+        扩展：Python中 字符串前面的 u、 r、 b 前缀分别表示 unicode编码规则、 非转义编码规则、 byte编码规则
+
+
+值(string)的操作
+
+    字符串操作：
+
+        set(name, value)    对键为name的string赋值为value                       # redis.set('name', 'Bob')
+        get(name)           返回键为name的string的value
+        getset(name, value) 给键为name的string赋值为value并返回之前的value
+        mget(keys, *args)   返回多个键对应的value，其中 keys 为键的列表           
+        setnx(name, value)  如果name键不存在则设置值为value，否则不变
+        setex(name, time, value)    设置name键的值为value，并设置有效期为time
+        setrange(name, offset, value)   设置name键的value值得子字符串           # redis.set('name', 'Hello')    redis.setrange('name', 6, 'World')
+        mset(mapping)       批量赋值，其中 mapping 为字典形式
+        msetnx(mapping)     指定键均不存在时才执行批量赋值  ★ 均不存在
+        incr(name, amount=1)    键为name的值进行增值操作，默认为1
+        decr(name, amount=1)    键为name的值进行减值操作，默认为1
+        append(key, value)      键为name的string的值追加value
+        substr(name, start, end=1)  返回键为name的string的子串
+        getrange(key, start, end)   获取键为name的值从start到end的子串
+
+
+    列表操作：
+        https://cuiqingcai.com/5587.html
+    集合操作：
+        https://cuiqingcai.com/5587.html
+    有序集合操作：
+        https://cuiqingcai.com/5587.html
+    散列操作：
+        https://cuiqingcai.com/5587.html
+
+
+
+数据导入/导出
+
+    导出：redis-dump
+    导入：redis-load
+        - h 可以查看参数说明
+
+    举例：
+        redis-dump -u :root@localhost:6379/db                           # 使用url连接   默认导出结果为列表形式 每一条数据是字典形式
+        redis-dump -u :root@localhost:6379/db > ./redis_data.jl         # 使用url连接   将导出结果输出为JSON文件
+        redis-dump -u :foobared@localhost:6379 -f py:* > ./redis.data.jl      # -f 参数设定过滤规则 只导出以py开头的数据
+
+        < redis_data.json redis-load -u :root@localhost:6379/db         # 使用url连接   将json行文件导入到Redis数据库中
+        cat redis_data.json | redis-load -u :root@localhost:6379/db     # 同上

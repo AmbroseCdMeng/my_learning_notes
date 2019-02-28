@@ -1,0 +1,23 @@
+2018年10月16日19:25:12
+
+***********************************
+
+Android 体系结构
+    Android 的体系结构主要分三层：
+        1、Linux 内核。主要包括各种基本驱动：声卡驱动、USB驱动、显卡驱动等。
+        2、Library 库。主要包括安卓系统中重要功能库：绘图框架、媒体框架、DB框架、C语言标准库等
+        3、APPLICATION FRAMEWORK 应用框架层。主要包括安卓系统的管理器、API、服务等
+        4、APPLICATION 应用层。主要包括安卓系统的应用程序：即平时常见的APP
+
+Android 的运行环境
+    Core Library  -->  类似于 JRE
+    Dalvik Vircual Machine  -->  简称：DVM 功能相当于 JVM
+
+    ☆ DVM 与 JVM 的区别：
+        JVM：.java --> javac --> .class -- jar --> .jar
+        DVM: .java --> javac --> .class --> dx.bat --> .dex
+
+        JVM 的架构：基于栈
+        DVM 的架构：基于寄存器（CPU 上一块高速的缓存）
+
+        

@@ -1,0 +1,13 @@
+﻿2018年10月7日14:46:51
+
+1、urllib 的使用
+		其是 Python 的内置的HTTP请求库。主要分为 4 个模块
+
+		request：它是基本的HTTP请求模块，可以模拟发送请求
+		error：异常处理模块。
+		parse：工具模块。提供拆分、解析、合并等
+		robotparser：主要用来识别robots.txt。判断网站是否可以爬
+
+	request模块 *****
+
+		urlopen()

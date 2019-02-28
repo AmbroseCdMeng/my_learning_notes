@@ -1,0 +1,165 @@
+2018年10月17日11:25:44
+
+    数据存储 -- 关系型数据库存储 -- MySQL数据存储
+
+关系型数据库是基于关系模型的数据库。
+而关系模型是通过二维表来保存的，所以它的存储方式就是通过行列组成的表。列是字段，行是记录。
+多个这样的二维表组成一个数据库，就是关系型数据库。
+
+MySQL 数据库
+    需要安装 pymysql 库。 在 Python2 中也可以使用 MySQLdb 库。
+    ▲ 默认端口：3306
+
+
+建立数据库连接 & 新建数据库实例
+    import pymysql              # 导入 mysql 操作库
+
+    db = pymysql.connect(host='localhost', user='root', password='123456', port=3306)       # 连接 MySQL
+    cursor = db.cursor()        # 获取 mysql 的操作游标  利用游标来执行 SQL 语句
+    cursor.execute('SELECT VERSION()')      # 执行 SQL 语句  获取 mysql 版本
+    data = cursor.fetchone()    # 获取返回结果的第一条记录
+    cursor.execute('CREATE DATABASE db_test DEFAULT CHARACTER SET utf8')        # 新建一个数据库 名为 db_test 并指定字符集
+    db.close()                  # 关闭数据库连接
+
+连接指定数据库 & 创建数据表
+    import pymysql
+
+    db = pymysql.connect(host='localhost', user='root', password='123456', port=3306, db='db_test')     # 连接指定数据库
+    cursor = db.cursor()
+    sql =   'CREATE TABLE IF NOT EXISTS student(
+                id VARCHAR(255) NOT NULL,
+                name VARCHAR(255) NOT NULL, 
+                age INT NOT NULL, 
+                PRIMARY KEY(id)
+            )'
+    cursor.execute(sql)
+    db.close()
+
+插入数据
+    import pymysql
+
+    db = pymysql.connect(host='localhost', user='root', password='123456', port=3306, db='db_test')
+    cursor = db.cursor()
+    sql = 'INSERT INTO student(id, name, age) values(%s, %s, %s)'       # 使用格式化符构造 SQL 语句
+                                # 关于格式化符 可参考：https://blog.csdn.net/shaotaiban1097/article/details/83108590
+
+    id = '20181017'         # 要插入的数据
+    name = 'Bob'
+    age = 18
+
+    try:
+        cursor.execute(sql, (id, user, age))        # 执行插入的SQL语句    value 值使用元组作为 execute 的第二个参数传递
+        db.commit()                                 # 执行成功后 提交
+    except:
+        db.rollback()                               # 执行异常后 回滚
+    db.close()                                      # 关闭连接
+
+
+    ☆★☆ 重构插入数据的代码：使用字典形式动态构造
+
+        可以这样写：
+
+        ……
+        data = {
+            'id':'20181017', 
+            'name':'Bob', 
+            'age':20
+        }
+        table = 'student'
+        keys = ', '.join(data.keys())           # 分隔符.join 方法的使用
+        values = ', '.join(['%s'] * len(data))  # 字符串中 * 的使用
+        sql = 'INSERT INTO {table}({keys} VALUES ({values})'.format(table = talbe, keys = keys, values = values)
+        try:
+            ……
+        except:
+            ……
+
+
+
+更新数据
+    ……
+    sql = 'UPDATE student SET age = %s WHERE name = %s'
+    try:
+        cursor.execute(sql, (19, 'Bob'));
+        db.commit()
+    except:
+        db.rollback()
+    db.close()
+
+    ☆★☆ 重构修改数据的代码：实现如果记录已经存在则更新而不重复添加  效果等同于 Orale 中 Merge 语法
+
+        data = {
+            'id': '20120001',
+            'name': 'Bob',
+            'age': 21
+        }
+
+        table = 'students'
+        keys = ', '.join(data.keys())
+        values = ', '.join(['%s'] * len(data))
+
+        sql = 'INSERT INTO {table}({keys}) VALUES ({values}) ON DUPLICATE KEY UPDATE'.format(table=table, keys=keys, values=values)
+        update = ','.join([" {key} = %s".format(key=key) for key in data])
+        sql += update
+        try:
+            if cursor.execute(sql, tuple(data.values())*2):
+                print('Successful')
+                db.commit()
+        except:
+            print('Failed')
+            db.rollback()
+        db.close()
+
+    最终构造的SQL语句如下：
+        INSERT INTO students(id, name, age) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE id = %s, name = %s, age = %s
+
+
+删除数据
+    ……
+    table = 'student'
+    condition = 'age > 20'
+    sql = 'DELETE FROM {table} WHERE {condition}'.format(table = talbe, condition = condition)
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except:
+        db.rollback()
+    db.close()
+
+
+★查询数据
+    查询语句由于返回的结果多有种情况。所以其操作游标对象有多种方法供调用。
+
+    ……
+    sql = 'SELECT * FROM student WHERE age >= 10'
+
+    try:
+        cursor.execute(sql)                              # 执行查询 SQL
+        print('COUNT:', cursor.rowcount)                 # 获取查询结果的条数
+        data = cursor.fetchone()                         # 返回查询结果的第一条记录  元组类型
+        result = cursor.fetchall()                       # 返回查询结果的所有记录    元组类型  不同的是，这个元组的每个元素还是元组类型的记录
+        for row in result:
+            print(row)
+    except:
+        print("Error")
+
+    ☆ 这里需要注意的是：
+        fetchall() 和 fetchone() 的内部实现都是指针偏移的结构。
+            即如上 调用了一个 fetchone() 方法 返回第一条记录 后， 再调用 fetchall() 方法， 返回的是 第二条(含)记录以后的结果
+
+            同理，也可以通过不断的循环调用 fetchone() 方法来获取查询结果的所有记录
+            推荐如此使用。
+                当数据量较大时，fetchall() 方法返回大量元组，内存开销会很大。
+                反而如果采用循环调用 fetchone() 方法逐条获取。如下：
+
+                    ……
+                    sql = 'SELECT * FROM students WHERE age >= 20'
+                    try:
+                        cursor.execute(sql)
+                        print('Count:', cursor.rowcount)
+                        row = cursor.fetchone()
+                        while row:
+                            print('Row:', row)
+                            row = cursor.fetchone()
+                    except:
+                        print('Error')

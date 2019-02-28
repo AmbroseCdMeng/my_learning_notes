@@ -1,0 +1,39 @@
+﻿2018年10月1日18:41:32
+
+/*******  部署相关库的安装  ********/
+
+1、Docker 安装
+	docker for windows 地址：https://docs.docker.com/docker-for-windows/install
+		docker for windows 目前仅支持 windows10 64 Pro 版本
+	如是其他版本操作系统，需安装 toolbox
+	docker toolbox 	地址：https://docs.docker.com/toolbox/toolbox_install_windows
+
+	docker id 的注册
+		因docker id 注册时会触发google的人机验证。所以需要使用国外VPN进行注册，即翻墙。
+		国内网站注册可能会导致人机验证的图片无法加载，最终产生的效果就是sign up 按钮一直是灰色而无法点击
+	
+
+2、Scrapyd 安装
+	scrapyd 是一个用户部署和运行 scrapy 项目的工具。基本上都使用的Linux主机。所以它的安装主要是针对Linux的
+	pip3 install scrapyd
+	
+	安装完成后需要自行添加配置文件
+	sudo mkdir /etc/scrapyd
+	sudo vi /etc/scrapyd/scrapyd.conf
+
+		其内容见 71~72 页
+
+3、Scrapyd Client 安装
+	pip3 install scrapyd-client
+
+4、Scrapyd API 安装
+	pip3 install python-scrapy-api
+
+5、Scrapyrt 安装
+	pip3 install scrapyrt
+
+6、Gerapy 安装
+	一个Scrapy的分布式管理模块
+	pip3 install gerapy
+
+********************************************  至此 Python 爬虫基本环境 搭建完成*************************************

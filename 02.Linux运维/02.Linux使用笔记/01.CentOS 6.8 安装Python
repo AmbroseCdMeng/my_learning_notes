@@ -1,0 +1,134 @@
+2018年12月13日19:10:04
+
+    CentOS 6.8 安装 Python 记录
+
+1、准备编译环境（已经配置过，所以 Nothing to do ）
+    [root@mode ~]# yum install zlib-devel openssl-devel ncurses-devel -y 
+    Loaded plugins: fastestmirror, security
+    Setting up Install Process
+    Loading mirror speeds from cached hostfile
+    * base: mirror.lzu.edu.cn
+    * extras: centos.communilink.net
+    * updates: mirror.lzu.edu.cn
+    Package zlib-devel-1.2.3-29.el6.x86_64 already installed and latest version
+    Package openssl-devel-1.0.1e-57.el6.x86_64 already installed and latest version
+    Package ncurses-devel-5.7-4.20090207.el6.x86_64 already installed and latest version
+    Nothing to do
+
+2、下载 Python3.6 代码包
+    [root@mode ~]# wget https://www.python.org/ftp/python/3.6.3/Python-3.6.3.tar.xz
+    --2018-12-06 21:17:13--  https://www.python.org/ftp/python/3.6.3/Python-3.6.3.tar.xz
+    Resolving www.python.org... 151.101.228.223, 2a04:4e42:1a::223
+    Connecting to www.python.org|151.101.228.223|:443... connected.
+    HTTP request sent, awaiting response... 200 OK
+    Length: 16974296 (16M) [application/octet-stream]
+    Saving to: 鈥Python-3.6.3.tar.xz鈥
+
+    2% [=>                    ] 481,164     17.0K/s  eta 14m 20s 
+
+3、解压源码
+    [root@mode local]# cd ~
+    [root@mode ~]# ll
+    total 37068
+    -rw-------.  1 root root     1203 Aug 27 07:33 anaconda-ks.cfg
+    drwxrwxr-x. 70 root root     4096 Dec  6 20:19 glibc-2.14
+    -rw-r--r--.  1 root root 20897040 Jun  1  2011 glibc-2.14.tar.gz
+    -rw-r--r--.  1 root root    29456 Aug 27 07:33 install.log
+    -rw-r--r--.  1 root root     7119 Aug 27 07:32 install.log.syslog
+    -rw-r--r--.  1 root root    25548 Apr  7  2017 mysql57-community-release-el7-10.noarch.rpm
+    -rw-r--r--.  1 root root 16974296 Oct  3  2017 Python-3.6.3.tar.xz
+    [root@mode ~]# tar xf Python-3.6.3.tar.xz -C /usr/local/src
+    [root@mode ~]# cd /usr/local/src
+    [root@mode src]# ll
+    total 4
+    drwxr-xr-x. 16 501 501 4096 Oct  3  2017 Python-3.6.3   
+
+4、安装编译所需依赖
+    [root@mode Python-3.6.3]# ll
+    total 1028
+    -rw-r--r--.  1 501 501  13335 Oct  3  2017 aclocal.m4
+    -rwxr-xr-x.  1 501 501  44259 Oct  3  2017 config.guess
+    -rwxr-xr-x.  1 501 501  36515 Oct  3  2017 config.sub
+    -rwxr-xr-x.  1 501 501 484734 Oct  3  2017 configure
+    -rw-r--r--.  1 501 501 160430 Oct  3  2017 configure.ac
+    drwxr-xr-x. 18 501 501   4096 Oct  3  2017 Doc
+    drwxr-xr-x.  2 501 501   4096 Oct  3  2017 Grammar
+    drwxr-xr-x.  2 501 501   4096 Oct  3  2017 Include
+    -rwxr-xr-x.  1 501 501   7122 Oct  3  2017 install-sh
+    drwxr-xr-x. 33 501 501   4096 Oct  3  2017 Lib
+    -rw-r--r--.  1 501 501  12757 Oct  3  2017 LICENSE
+    drwxr-xr-x.  8 501 501   4096 Oct  3  2017 Mac
+    -rw-r--r--.  1 501 501  59746 Oct  3  2017 Makefile.pre.in
+    drwxr-xr-x.  2 501 501   4096 Oct  3  2017 Misc
+    drwxr-xr-x. 13 501 501   4096 Oct  3  2017 Modules
+    drwxr-xr-x.  4 501 501   4096 Oct  3  2017 Objects
+    drwxr-xr-x.  2 501 501   4096 Oct  3  2017 Parser
+    drwxr-xr-x.  6 501 501   4096 Oct  3  2017 PC
+    drwxr-xr-x.  2 501 501   4096 Oct  3  2017 PCbuild
+    drwxr-xr-x.  2 501 501   4096 Oct  3  2017 Programs
+    -rw-r--r--.  1 501 501  41453 Oct  3  2017 pyconfig.h.in
+    drwxr-xr-x.  3 501 501   4096 Oct  3  2017 Python
+    -rw-r--r--.  1 501 501   9269 Oct  3  2017 README.rst
+    -rw-r--r--.  1 501 501 101514 Oct  3  2017 setup.py
+    drwxr-xr-x. 23 501 501   4096 Oct  3  2017 Tools
+
+    [root@mode Python-3.6.3]# ./configure --prefix=/usr/local/Python3
+    checking build system type... x86_64-pc-linux-gnu
+    checking host system type... x86_64-pc-linux-gnu
+    checking for python3.6... no
+    checking for python3... no
+    checking for python... python
+    checking for --enable-universalsdk... no
+    checking for --with-universal-archs... no
+    checking MACHDEP... linux
+    checking for --without-gcc... no
+    checking for --with-icc... no
+    checking for gcc... gcc
+    checking whether the C compiler works... yes
+    checking for C compiler default output file name... a.out
+    checking for suffix of executables... 
+    checking whether we are cross compiling... no
+    checking for suffix of object files... o
+    checking whether we are using the GNU C compiler... yes
+    checking whether gcc accepts -g... yes
+    checking for gcc option to accept ISO C89... none needed
+    .................
+    .... 过程省略 ....
+    .................
+    config.status: creating pyconfig.h
+    creating Modules/Setup
+    creating Modules/Setup.local
+    creating Makefile
+
+
+    If you want a release build with all stable optimizations active (PGO, etc),
+    please run ./configure --enable-optimizations
+
+
+    [root@mode Python-3.6.3]# ./configure --enable-optimizations
+    .................
+    .... 过程省略 ....
+    .................
+    config.status: pyconfig.h is unchanged
+    creating Modules/Setup
+    creating Modules/Setup.local
+    creating Makefile
+
+5、安装 python3
+    [root@mode Python-3.6.3]# make -j 4 && make install
+    .................
+    .... 过程省略 ....
+    .................
+    Collecting setuptools
+    Collecting pip
+    Installing collected packages: setuptools, pip
+    Successfully installed pip-9.0.1 setuptools-28.8.0
+
+6、更换 Python 默认版本为3.6
+    [root@mode Python-3.6.3]# python --version
+    Python 2.6.6
+    mv /usr/bin/python /usr/bin/python_bak
+    [root@mode bin]# ln -s /usr/local/bin/python3 /usr/bin/python
+    [root@mode bin]# python --version
+    Python 3.6.3
+    [root@mode bin]# 

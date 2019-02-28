@@ -1,0 +1,63 @@
+2019年2月26日20:56:18
+
+
+版本回退
+
+先再次尝试修改并提交 readme.txt 文件
+    再加一行内容
+    git add readme.txt
+    git commit -m "append text 2019年2月26日20:59:03"
+
+回忆刚才进行的操作，readme.txt 的版本应该已经有三个
+    1. write a file
+    2. update file
+    3. append text
+
+
+在实际操作中，使用 git log 命令查看版本提交的历史记录
+
+    F:\998.learngit>git log
+    commit ac64be7c60873352d7eb6fc6197b3bdbfb9385eb
+    Author: MengChengdu <mcd.951026@foxmail.com>
+    Date:   Tue Feb 26 21:01:07 2019 +0800
+
+        2019年2月26日20:59:03
+
+    commit ec0777ac16b6fb0bb1bb42f0aed152a5ca41b2f6
+    Author: MengChengdu <mcd.951026@foxmail.com>
+    Date:   Mon Feb 25 19:36:19 2019 +0800
+
+        update file -- add a message
+
+    commit e299935e53370894386659b06d19a7615e24f6e2
+    Author: MengChengdu <mcd.951026@foxmail.com>
+    Date:   Mon Feb 25 19:15:24 2019 +0800
+
+        create a reaad file, test
+
+
+版本回退
+    首先、 Git 必须知道当前的版本号。
+    在 Git 命令中，用 HEAD 表示最近提交的版本号（ac64be7c60873352d7eb6fc6197b3bdbfb9385eb）， 
+    HEAD^ 表示上一个版本， HEAD^^ 表示上上一个版本， HEAD~100 表示往上100个版本
+
+    回退到上一个版本使用命令 git reset
+
+        git reset --hard HEAD^
+
+        F:\998.learngit>git reset --hard HEAD^
+        More? ^
+        HEAD is now at ec0777a update file -- add a message
+
+        此时，再次打开 readme.txt 文档就发现，已经回退到了第二个版本
+
+        如果这时候又不想回退了，想要恢复到第三个版本呢？
+        会发现 这个时候 git log 已经只有两个版本了，没有了第三个版本，也就是说 HEAD 已经不能用了……
+
+        这时，就需要使用版本号了。
+
+        F:\998.learngit>git reset --hard ac64be7c60873352d7eb6fc6197b3bdbfb9385eb
+        HEAD is now at ac64be7 2019年2月26日20:59:03
+
+        这样就又会恢复到第三个版本。这里，版本号也并不是要完全记住，只需要输入开始的几位就可以了，当然，也不能位数太少，不然不唯一的话也是会失败的
+        

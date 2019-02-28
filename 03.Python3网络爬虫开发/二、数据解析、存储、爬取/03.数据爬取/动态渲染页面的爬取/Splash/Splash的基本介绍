@@ -1,0 +1,106 @@
+2018年11月12日20:06:04
+
+    数据爬取 -- 动态渲染页面的爬取 --  Splash的基本介绍
+
+Splash 是一个 JavaScript 渲染服务。是一个带有 HTTP API 的轻量级浏览器。
+同时，它对接了 Twisted 和 QT 库。
+
+1、功能介绍
+    异步方式处理多个网页渲染过程
+    获取渲染后的页面的源代码或截图
+    通过关闭图片渲染或者利用 Adblock 规则来加快页面的渲染速度
+    可以执行特定的 JavaScript 脚本
+    可以通过 Lua 脚本来控制页面渲染过程
+    获取渲染的详细过程并通过 HAR(HTTP Archive) 格式呈现
+
+2、准备工作
+    安装 Splash 并正常运行服务
+        安装 splash 需要安装 docker -- 详见（开发环境配置 -- 爬虫框架安装）
+    运行 splash 服务
+        docker run -p 8050:8050 scrapinghub/splash
+        
+        ★ 运行之前需要开启 docker 服务并运行 docker。
+            同时，运行 docker 需要开启 Hyper-V 服务。
+            该组件（Hyper-V）与 一些软件 冲突，所以大多数情况下很可能是“卸载状态”的，需要在 控制面板 windows功能中 重新安装启用并重启计算机 然后重启服务
+            
+
+3、实例引入
+    端口：8050
+    http://localhost:8050
+
+    以 https://www.baidu.com 为例
+        输入地址，点击 Render me 按钮开始渲染
+
+    可以看到，网页返回了渲染截图、HAR 加载统计数据、网页源码等。
+    通过 HAR 可以看到，Splash 执行了整个网页的渲染过程，包括 CSS、JavaScript 等的加载过程。
+    其呈现结果与浏览器中的完全一致。
+
+    该过程是由一段 Lua 语言脚本实现。
+
+4、Splash Lua 脚本
+    可以利用 Splash 来模拟类似 Chrome、PhantomJS 的操作。
+
+    4.1 脚本入口和执行方式
+
+        function main(splash, args)
+            splash:go("http://www.baidu.com")
+            splash:wait(0.5)
+            local title = splash:evaljs("document.title")
+            return {title = title}
+        end
+
+        以上代码可以再 Splash 的代码编辑区执行
+            执行结果会返回网页标题。
+            这里，我们通过 evaljs() 方法传入 JavaScript 脚本， 而 document.title 的执行结果返回了网页的标题。 执行完后赋值为 title 并返回。    
+            
+            需要注意的是：这里的方法名称必须叫做 main()。 Splash 会默认调用这个方法
+            返回值的类型可以是字典形式，也可以是字符串形式。最后都会被转换为 Splash HTTP Response
+
+    4.2 异步处理
+
+        Splash 支持异步处理。但是这里并没有显式的指明回调的方法，其回调的跳转是在 Splash 内部完成的。
+        
+        function main(splash, args)
+            local example_urls = {"www.baidu.com", "www.taobao.com", "www.zhihu.com"}
+            local urls = args.urls or example_urls
+            local results = {}
+            for index, url in ipairs(urls) do
+                local ok, reason = splash:go("http://" .. url)
+                if ok then
+                    splash:wait(2)
+                    results[url] = splash:png()
+                end
+            end
+            return results
+        end
+
+        脚本中的 wait() 方法类似于 Python 中的 sleep() 。其参数为等待的秒数。
+        当 Splash 执行次方法时，它会转而去处理其他任务，等待指定的时间后再回来继续处理
+
+            需要注意的是：Lua 脚本中的字符串拼接使用的是 .. 操作符
+            另外，这里做了加载的的异常检测。
+                go() 方法返回加载页面的结果状态，如果页面出现 4xx 或 5xx 的状态码。ok 变量 就会为空。就不会返回加载后的图片
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

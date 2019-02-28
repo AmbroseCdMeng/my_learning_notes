@@ -1,0 +1,73 @@
+2018年11月13日19:35:58
+
+    数据爬取 -- 动态渲染页面的爬取 --  Splash 对象的属性
+
+    可以发现，前面两个例子中 main() 方法的第一个参数是 splash ，这个对象非常重要。
+    其相当于 selenium 中的 WebDriver 对象。
+    我们可以调用的它的一些属性和方法来控制加载过程。
+
+splash 的属性：
+    args：
+        该属性可以获取加载时配置的参数，比如 URL， 如果为 GET 请求，它还可以获取 GET 请求参数，如果为 POST 请求，它还可以获取表单提交的数据。
+        同时，Splash 支持使用第二个参数直接作为 args。
+        其实
+            function main(splash, main)
+                local url = args.url
+            end
+
+            function main(splash)
+                local url = splash.args.url
+            end
+        这两段代码是完全等价的。其中 args 参数就相当与 splash 的 args 属性
+
+    js_enabled：
+        该属性是 Splash 的 JavaScript 执行开关。
+        可以将其配置为 true 或者 false 来控制是否执行 JavaScript 代码，默认为 true
+        例如
+            function main(splash, args)
+                splash:go("http://www.baidu.com")
+                splash.js_enabled = false
+                local title = splash:evaljs("document.title")
+                return {title = title}
+            end
+        这段代码就会抛出异常。因为我们关闭了 JavaScript 代码的执行开关，所以无法获取到 title 值，因此也无法返回
+
+    resource_timeout：
+        该属性可以设置加载的超时时间，单位为秒。
+        如果设置为 0 或 nil。代表不检测超时。
+        例如：
+            function main(splash, args)
+                splash.resource_timeout = 0.1
+                assert(splash:go("http://www.baidu.com"))
+                return splash:png()
+            end
+        这段代码将在目标地址 0.1 秒之内没有响应的情况下抛出异常
+
+    images_enabled：
+        该属性可以设置图片是否加载。默认情况下是加载的
+        禁用该属性后，可以节省网络流量，提升加载速度。
+        但是，需要注意的是，禁用图片的加载很可能会影响到 JavaScript 的渲染。从而影响 DOM 节点的位置
+        另外：如果禁用了图片加载后仍然发现有图片加载出来，很有可能是因为之前加载的缓存，清空缓存或者重启 Splash 后重试即可
+        例如：
+            function main(splash, args)
+                splash.images_enabled = false
+                assert(splash:go("http://www.baidu.com"))
+                return {png = splash:png()}
+            end
+
+    plugins_enabled：
+        该属性用来控制浏览器插件（如：Flash）是否开启。默认情况下是 false 表示不开启。
+        例如：
+            function main(splash, args)
+                splash.plugins_enabled：true
+                ...
+            end
+
+    scroll_position
+        该属性用来控制页面上下或左右滚动。
+        例如：
+            function main(splash, args)
+                assert(splash:go("http://www.baidu.com"))
+                splash.scroll_position = {y=400}
+                return {png = splash.png()}
+            end

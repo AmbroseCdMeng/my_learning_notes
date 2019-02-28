@@ -1,0 +1,329 @@
+2018年11月14日19:06:47
+
+    数据爬取 -- 动态渲染页面的爬取 --  Splash 对象的方法
+
+splash 的方法：
+    go()：
+        该方法用来请求某个链接。
+        可以模拟 GET 和 POST 请求。同时支持传入请求头、表单等数据
+        用法如下：
+            ok, reason = splash:go{url, baseurl = nil, headers = nil, http_method = "GET", body = nil, formdate = nil}
+            参数说明：
+                url：请求的 URL
+                baseurl：资源加载的相对路径。可选参数，默认为空
+                headers：请求头。可选参数， 默认为空
+                http_method：请求类型。可选参数，默认为 GET
+                body：发送 POST 请求时的表单数据。使用的 Content-Type 为 application/json。可选参数，默认为空
+                formdate：发送 POST 请求时的表单数据。使用的 Content-Type 为 application/x-www-form-urlencoded。可选参数，默认为空
+            返回值：
+                返回执行的结果 ok 和原因 reason 
+                如果 OK 为空，则代表网页加载出现了异常，此时 reason 中包含错误的原因
+            代码示例：
+                function main(splash, args)
+                    local ok, reason = splash:go{"http://httpbin.org/post", http_method = "POST", body = "name = Germey"}
+                    if ok then
+                        return splash:html()
+                    end
+                end
+
+    wait()：
+        该方法可以控制页面的等待时间
+        用法如下：
+            ok, reason = splash:wait{time, cancel_on_redirect = false, cancel_on_error = true}
+            参数说明：
+                time：等待的时间。单位为秒
+                cancel_on_redirect：如果发生了重定向就停止等待，并返回重定向结果。可选参数， 默认false
+                cancel_on_error：如果发生了加载错误就停止等待，
+            返回值：
+                结果 ok 和 原因 reason 的组合
+            代码示例：
+                function main(splash)
+                    splash:go("http://www.taobao.com")
+                    splash:wait(2)
+                    return {html = splash:html()}
+                end
+
+    jsfunc()：
+        该方法可以直接调用 JavaScript 定义的方法，但是所调用的方法需要用双中括号包围，这相当于实现了 JavaScript 到 Lua 脚本的转换
+            代码示例：
+                function main(splash, args)
+                    local get_div_count = splash:jsfunc([[
+                        function (){
+                            var body = document.body;
+                            var divs = body.getElementByTagName('div')
+                            return divs.length;
+                        }
+                    ]])
+                    splash:go("http://www.baidu.com")
+                    return ("There are %s DIVS"):format(get_div_count)
+                end
+
+    evaljs()：
+        该方法可以执行 JavaScript 代码并返回最后一条 JavaScript 语句的执行结果
+        用法如下：
+            result = splash:evaljs(js)
+            参数说明：  
+                js：JavaScript 代码
+            返回值：
+                最后一条 JavaScript 代码的执行结果
+            代码示例：
+                local title = splash:evaljs("document.title")
+
+    runjs()：
+        该方法可以执行 JavaScript 代码。
+        功能与 evaljs 类似。但是更加偏向于执行某些动作或声明某些方法。
+            代码示例：
+                function main(splash, args)
+                    splash:go("http://www.baidu.com")
+                    splash:runjs("foo = function(){return 'bar'}")
+                    local result = splash:evaljs("foo()")
+                    return result
+                end
+
+    autoload()：
+        该方法可以设置每个页面访问时自动加载的对象。
+        用法如下：
+            ok, reason = splash:autoload{source_or_url, source = uil, url = uil}
+            参数说明：
+                source_or_url：JavaScript 代码或者 JavaScript 库连接
+                source：JavaScript 代码。可选参数， 默认为空
+                url：JavaScript 库连接。可选参数， 默认为空
+            特殊说明：
+                该方法只负责加载 JavaScript 代码或者库。不执行任何操作。
+                如果需要执行 JavaScript 代码，可以调用 evaljs() 或者 runjs() 方法
+            代码示例：
+                function main(splash, args)
+                    splash:autoload([[
+                        function get_document_title(){
+                            return document.title
+                        }
+                    ]])
+                    splash:go("http://www.baidu.com")
+                    return splash:evaljs("get_document_title()")
+                end
+
+    call_later()：
+        该方法可以通过设置定时任务和延迟时间来实现任务延时执行。
+        并且可以再执行前通过 cancel() 方法重新执行定时任务。
+            代码示例：
+                function main(splash, args)
+                    local snapshots = {}
+                    local timer = splash:call_later(function()
+                        snapshots["a"] = splash:png()
+                        splash:wait(1.0)
+                        snapshots["b"] = splash:png()
+                    end, 0.2)
+                    splash:go("https://www.taobao.com")
+                    splash:wait(3.0)
+                    return snapshots
+                end
+            以上代码我们设置了一个定时任务。在 0.2 秒的时候获取网页截图，然后等待 1.0 秒， 1.2秒的时候再次获取网页截图。
+
+    http_get()：
+        该方法可以模拟发送 HTTP 的 GET 请求。
+        用法如下：
+            response = splash:http_get{url, headers = nil, follow_redirects = true}
+            参数说明：
+                url：请求 URL
+                headers：请求头。可选参数，默认为空
+                follow_redirects：是否启动自动重定向。可选参数，默认 true
+            代码示例：
+                function main(splash, args)
+                    local treat = require("treat")
+                    local response = splash:http_get("http://httpbin.org/get")
+                    return {
+                        html = treat.as_string(response.body),
+                        url = response.url,
+                        status = response.status
+                    }
+                end
+            
+    http_post()：
+        该方法可以模拟发送 HTTP 的 GET 请求。
+        用法如下： 
+            response = splash:http_post{url, header = nil, follow_redirects = true, body = nil}
+            参数说明：
+                url：请求 URL
+                headers：请求头。可选参数，默认为空
+                follow_redirects：是否启动自动重定向。可选参数，默认 true
+                body：表单数据。可选参数，默认为空
+            代码示例：
+                function main(splash, args)
+                    local treat = require("treat")
+                    local json = require("json")
+                    local response = splash:http_post{
+                        "http://httpbin.org/post",
+                        body = json.encode({name = "Germey"}),
+                        headers = {["content-type"] = "application/json"}
+                    }
+                    return {
+                        html = treat.as_string(response.body),
+                        url = response.url,
+                        status = response.status
+                    }
+                end
+
+    set_content： 
+        该方法用来设置页面的内容。
+            代码示例：
+                function main(splash, args)
+                    assert(splash:set_content("<html><body><h1>Hello</h1></body></html>"))
+                    return splash:png()
+                end
+
+
+    html()：
+        该方法用来获取网页的源代码。
+            代码示例：
+                function main(splash, args)
+                    splash:go("https://httpbin.org/get")
+                    return splash:html()
+                end
+
+    png()：
+        该方法用来获取当前页面 PNG 格式的截图。
+            代码示例：
+                function main(splash, args)
+                    splash:go("https://www.12306.cn/")
+                    return splash:png()
+                end
+
+    jpeg()：
+        该方法用来获取当前页面 JPEG 格式的截图。用法同上。
+
+    har()：
+        该方法用来获取页面加载过程描述
+            代码示例：
+                function main(splash, args)
+                    splash:go("https://www.12306.cn")
+                    return splash:har()
+                end
+    
+    url()：
+        该方法可以获取当前正在访问的 url 
+            代码示例：
+                function main(splash, args)
+                    splash:go("https://www.12306.com")
+                    return splash:url()
+                end
+        
+    get_cookies()：
+        该方法可以获取当前页面的 cookies
+            代码示例：
+                function main(splash, args)
+                    splash:go("https://www.12306.com")
+                    return splash:get_cookies()
+                end
+
+    add_cookies()：
+        该方法可以为当前页面添加 cookie
+        用法如下：
+            cookies = splash:add_cookie{name, value, path = nil, domain = nil, expires = nil, httpOnly = nil, secure = nil}
+            代码示例：
+                function main(splash, args)
+                    splash:add_cookie{"sessionid", "123456789abcdefg", "/", domain = "http://example.com"}
+                    splash:go("http://example.com")
+                    return splash:html()
+                end
+
+        clear_cookies()：
+        该方法可以清楚所有的 cookies 
+            代码示例：
+                function main(splash)
+                    splash:go("https://www.baidu.com")
+                    splash:clear_cookies()
+                    return splash:get_cookies()
+                end
+
+    get_viewport_size()：
+        该方法可以获取当前浏览器页面的大小
+            代码示例：
+                function main(splash, args)
+                    splash:go("https://www.baidu.com")
+                    return splash:get_viewport_size()
+                end
+    
+    set_viewport_size()：
+        该方法可以设置当前浏览器的大小
+        用法如下：  
+            splash:set_viewport_size(width, height)
+            代码示例：
+                function main(splash, args)
+                    splash:set_viewport_size(400,700)
+                    assert(splash:go("https://cuiqingcai.com"))
+                    return splash:png()
+                end
+
+    set_viewport_full()
+        该方法可以这只浏览器全屏显示。
+            代码示例：
+                function main(splash)
+                    assert(splash:go("https://cuiqingcai.com"))
+                    return splash:png()
+                end
+
+    set_user_agent()：
+        该方法可以设置浏览器的 User-Agent
+            代码示例：
+                function main(splash)
+                    splash:set_user_agent('Splash')
+                    splash:go("http://httpbin.org/get")
+                    return splash.html()
+                end
+    
+    set_custom_headers()：
+        该方法可以设置请求头
+            代码示例：
+                function main(splash)
+                    splash:set_custom_headers({
+                        ["User-Agent"] = "Splash",
+                        ["Site"] = "Splash"
+                    })
+                    splash:go("http://httpbin.org/get")
+                    return splash:html()
+                end
+    
+    select()：
+        该方法可以选中符合条件的第一个节点。如果有多个符合条件，只会返回第一个。
+            参数说明：
+                参数为 CSS 选择器
+            代码示例：
+                function main(splash)
+                    splash:go("https://www.baidu.com")
+                    input = splash:select("#kw")
+                    input:send_text('Lua')
+                    splash:wait(3)
+                    return splash:png()
+                end
+
+    select_all()：
+        该方法可以选中所有符合条件的节点。
+            参数说明：
+                参数为 CSS选择器
+            代码示例： 
+                function main(splash)
+                    local treat = require('treat')
+                    assert(splash:go("http://quotes.toscrape.com"))
+                    assert(splash:wait(0.5))
+                    local texts = splash:select_all('.quote .text')
+                    local results = {}
+                    for index, text in ipairs(texts) do
+                        results[index] = text.node.innerHTML
+                    end
+                    return treat.as_array(results)
+                end
+
+    mouse_click()：
+        该方法可以模拟鼠标单击操作。
+        可以传入坐标值 x 和 y 作为参数。也可以直接选中某个节点调用此方法。
+            代码示例：
+                function main(splash)
+                    splash:go("https://www.baidu.com")
+                    input = splash:select("#kw")
+                    input:send_text('Lua')
+                    submit = splash:select('#su')
+                    submit:mouse_click()
+                    splash:wait(3)
+                    return splash:png()
+                end
+

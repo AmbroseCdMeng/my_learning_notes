@@ -1,0 +1,59 @@
+﻿2018年8月23日20:16:19
+
+
+第五章  CSRF 攻击演示
+
+	下载 DVWA 靶机环境
+	安装phpStudy环境并配置靶机环境和数据库
+
+	DVWA 登录页面
+		http://127.0.0.1/DVWA/login.php
+			默认用户名密码 ： admin
+					  password
+
+	进入 DVWA 主页
+		DVWA Security 菜单	选择靶机难度-->Low(入门)
+		
+	CSRF 演示
+		1、CSRF 选项卡中 修改密码为 123456 方便演示
+
+		2、CSRF 选项卡中 ViewSource 查看源码
+
+			~ DVWA\vulnerabilities\csrf\source\low.php
+
+		源码
+		
+<?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+	// Get input
+	$pass_new  = $_GET[ 'password_new' ];
+	$pass_conf = $_GET[ 'password_conf' ];
+
+	// Do the passwords match?
+	if( $pass_new == $pass_conf ) {
+		// They do!
+		$pass_new = ((isset($GLOBALS["___mysqli_ston"]) && is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+		$pass_new = md5( $pass_new );
+
+		// Update the database
+		$insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "';";
+		$result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+
+		// Feedback for the user
+		$html .= "<pre>Password Changed.</pre>";
+	}
+	else {
+		// Issue with passwords matching
+		$html .= "<pre>Passwords did not match.</pre>";
+	}
+
+	((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?>
+
+
+实现功能 ：
+
+	登录状态下。触发以上代码。自动将密码修改为指定密码并被获取

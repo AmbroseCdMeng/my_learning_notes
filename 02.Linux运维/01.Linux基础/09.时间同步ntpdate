@@ -1,0 +1,43 @@
+2018年10月18日21:24:39
+
+时间同步
+	ntpdate 命令	
+	因为 CentOS 6 和 CentOS 5 的 ntpdate 命令所在目录不同。
+	所以我们如果环境变量中没有这个命令，可以使用 which ntpdate 在root用户下来查看命令的目录
+	ntpdate time.nist.gov
+	如果命令无法执行：
+		[root@mode ~]# /usr/sbin/ntpdate time.nist.gov
+		28 Aug 03:45:25 ntpdate[63001]: no server suitable for synchronization found
+	可以尝试以下办法：
+		1、尝试关闭防火墙
+		2、检查网络是否通畅
+		3、查看域名解析是否正常（以CentOS 6.5为例。其他版本命令路径可能不同 ）
+			
+			[root@mode ~]# ntlookup time.nist.gov
+			-bash: ntlookup: command not found
+			[root@mode ~]# nslookup time.nist.gov
+			Server:         114.114.114.114
+			Address:        114.114.114.114#53
+
+			Non-authoritative answer:
+			time.nist.gov   canonical name = ntp1.glb.nist.gov.
+			Name:   ntp1.glb.nist.gov
+			Address: 128.138.141.172
+			如上提示：无法找到time.stdtime.gov服务。规范名称 ntp1.glb.nist.gov.
+			所以可以尝试更换名称执行：
+				[root@mode ~]# /usr/sbin/ntpdate ntp1.glb.nist.gov.
+				18 Oct 20:57:27 ntpdate[32191]: step time server 128.138.141.172 offset 4466016.462504 sec
+			成功
+
+
+2018年10月20日12:04:31
+
+锁定关键系统文件
+	chattr 命令
+	锁定关键文件，防止被可以修改、删除
+
+		chattr +i /etc/passwd
+		chattr +i /etc/shadow
+		chattr +i /etc/group
+		chattr +i /etc/gshadow
+		chattr +i /etc/inittav

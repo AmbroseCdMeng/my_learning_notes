@@ -1,0 +1,65 @@
+2018年10月10日08:24:11
+
+XPath 是 Python 常用的HTML解析库之一。
+
+XPath 常用规则：
+    nodename        选取此节点的所有子节点
+    /               从当前节点选取直接子节点
+    //              从当前节点选取子孙节点
+    .               选取当前节点
+    ..              选取当前节点的父节点
+    @               选取当前属性
+    *               所有节点
+
+    例如： //title[@lang='eng'] 
+        代表选择所有名称为title同时lang属性的值为eng的节点
+
+
+lxml 库的 etree 模块：
+    该模块用来解析并自动修正HTML文本。
+    调用tostring()方法可以自动修正未闭合的Html代码标签并自动加上body、html等标签。
+    但是输出的结果是bytes类型。
+    可以使用decode()将其转换成str类型
+
+    from lxml import etree
+    html = etree.parse('test.html', etree.HTMLParser())
+    result = etree.tostring(html)
+    print(result.decode('utf-8'))
+
+
+实例
+    from lxml import etree
+    html = etree.parse('test.html', etree.HTMLParser())
+
+    result = html.xpath('//*')                          # 匹配所有节点
+    result = html.xpath('//li')                         # 匹配所有li节点
+
+    result = html.xpath('//li[@class="item"]')          # 匹配所有class属性为item的li节点
+    result = html.xpath('//li[@class="item"]/text()')   # 匹配所有class属性为item的li节点中的直接文本(不包括li标签下子节点中的文本)
+
+    result = html.xpath('//li/a')                       # 匹配所有li节点下所有直接a子节点
+    result = html.xpath('//li//a')                      # 匹配所有li节点下所有子孙a节点
+
+    resutl = html.xpath('//a[@href="test"]/../@class')  # 匹配href属性为test的a节点的父节点 然后获取其class属性(★注意：属性过滤匹配和属性获取的写法不同，中括号)
+    result = html.xpath('//a[@href="test"]/parent::*/@class')   # 同上
+
+    result = html.xpath('//li[contains(@class, "item")]/a/text()')
+                                                        # 属性多值匹配  当class属性中有多个值时 使用contains方法，第一个参数为属性名称，第二个参数为属性值
+    result = html.xpath('//li[contains(@class, "item") and @name="test"]/a/text()')
+                                                        # 多属性匹配    当需要根据多个属性确定一个节点时，需要使用到运算符。类似的运算符还有or mod + - * / > < = != 等等
+
+    result = html.xpath('//li[1]/a/text()')             # 匹配第一个li节点中a节点的直接文本(这里索引是从 1 开始计数而非 0 )
+    result = html.xpath('//li[last()]/a/text()')        # 匹配最后一个li节点中a节点的直接文本
+    result = html.xpath('//li[position()<3]/a/text()')  # 匹配前两个li节点中a节点的直接文本
+    resutl = html.xpath('//li[last()-2]/a/text()')      # 匹配倒数第三个li节点中a节点的直接文本
+    
+    
+
+
+    这里返回的结果是一个列表形式
+        每个元素都是Element类型，其后跟了节点的名称
+    如：    [<Element html at 0x10510d9c8>, <Element body at 0x10510da08>, <Element div at 0x10510da48>]
+    
+    如果要选取其中一个对象，只需要在result结果后使用中括号+索引的形式即可
+    如：    result[0]
+    输出：  <Element html at 0x10510d9c8>

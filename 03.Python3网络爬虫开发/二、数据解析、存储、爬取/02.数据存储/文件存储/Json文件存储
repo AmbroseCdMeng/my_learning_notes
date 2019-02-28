@@ -1,0 +1,96 @@
+2018年10月16日16:56:02
+
+    数据存储 -- 文件存储 -- Json文件存储
+
+Json 全称：JavaScript Object Notation。即 JavaScript 对象标记。
+它通过对象和数组的组合来表示数据，构造简洁但结构化程度非常高，是一种轻量级数据交换格式。
+
+    在 JavaScript 语言中，任何支持的类型都可以通过 JSON 来表示。包括字符串、数组、对象等。
+
+    最常用的两种 JavaScript 类型：数组 & 对象
+        对象：用{}包起来的内容
+            格式：{key1:value1, key2:value2, ……}
+            键：整数 或 字符串
+            值：任意类型
+        数组：用[]包起来的内容
+            格式：[value1, value2, ……]
+            索引：
+            值：任意类型
+
+    最常用的一种 JSON 对象格式：
+        [{key01:value01, key02:value02, ……}, {key11:value11, key12:value12, ……}, ……]
+
+
+读取 JSON 对象：
+    需要导入 json 库
+        常用方法：
+            loads()：将 JSON 文本字符串转换成 JSON 对象
+            
+        例如：
+            import json
+            str = '''
+            [{
+                "name": "Bob",
+                "gender": "male",
+                "birthday": "1992-10-18"
+            }, {
+                "name": "Selina",
+                "gender": "female",
+                "birthday": "1995-10-18"
+            }]
+            '''
+            data = json.loads(str)
+            print(data)    
+            # 结果如下： [{'name': 'Bob', 'gender': 'male', 'birthday': '1992-10-18'}, {'name': 'Selina', 'gender': 'female', 'birthday': '1995-10-18'}]
+            # 由于最外层是 [] ，所以最终的类型是列表类型
+
+        可以根据列表 索引+键名 取值：
+            data[0]['name']         # Bob
+            data[0].get('name')     # Bob
+
+            ★ 这里推荐使用get()方法。即使键名不存在，也不会报错，而是返回None。
+            另外，get()方法还可以传入第二个参数，第二个参数为键名不存在时的默认值。
+
+            data[0].get('name', 'Lucy')     # Bob
+            data[0].get('age')              # None
+            data[0].get('age', 20)          # 20
+            data[0]['age']                  # Error：找不到键名
+
+        ★★★ Json字符串 的数据需要双引号来包括，而不能使用单引号。Json 对象的内容可以使用单引号
+        如下：
+            str1 = [{"name", "Bob"}, {"name", 'Linda'}]      
+            str2 = [{'name', 'Bob'}, {'name', 'Linda'}]      
+            json.loads(str1)    # OK
+            json.loads(str2)    # JSONDecodeError
+
+    一般情况下 Json 字符串都会被保存为 .json 的文本文件
+        import json
+        with open('filename.json', 'r') as file:
+            str = file.read();
+            data = str.loads(str)
+            print(data)
+
+输出 JSON 对象：
+    需要导入 json 库
+        常用方法：
+            dumps()：将 JSON 对象转换成 JSON 文本字符串
+
+        例如：
+            import json
+            data = [{
+                'name': 'Bob',
+                'gender': 'male',
+                'birthday': '1992-10-18'
+            }]
+            with open('data.json', 'w') as file:
+                file.write(json.dumps(data))            # 保存成普通文本形式
+                
+        或者：
+            with open('data.json', 'w') as file:
+                file.write(json.dumps(data, indent=2))  # 按照指定缩进字符个数保存为Json格式 例如指定缩进2字符
+
+        或者：默认状态下Json对象中的中文字符会在转换文本字符串时自动转换为Unicode字符
+            with open('data.json', 'w') as file:
+                file.write(json.dumps(data, indent=2, ensure_ascii=False))
+                                                        # 规定文件输出编码 输出中文
+    

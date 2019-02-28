@@ -1,0 +1,64 @@
+2018年10月17日10:34:52
+
+    数据存储 -- 文件存储 -- Json文件存储
+
+CSV 全称：Comma-Separated Values。即 字符分割值。
+其文件已纯文本形式存储表格数据。
+    该文件是一个字符序列，可以由任意数目的记录组成，记录之间以某种换行符分割。
+    其记录由字段组成，字段之间以其他字符或字符串分割（最常见的是逗号和制表符）。
+    ☆ 它所有的记录的字段序列都完全相同。相当于一个纯文本化的表格
+
+写入 CSV 文件
+    1、导入csv库。
+    2、以写入方式打开一个csv文件。
+    3、调用csv库的writer()方法初始化写入对象
+    4、调用该对象的writerow()方法传入一行数据。如果多行，则多次调用writerow()或者调用writerows()。
+
+    例如：
+        
+        import csv
+        with open('data.csv', 'w') as csvfile:
+            writer = csv.writer(csvfile, delimiter=',')     # delimiter 参数是每个字段时间的分隔符 如果无此参数 默认分隔符时逗号 ,
+            writer.writerow(['id', 'name', 'age'])
+            writer.writerow(['001', 'Bob', 18])
+            writer.writerow(['002', 'Mike', 19])
+
+            writer.writerows([['001', 'Bob', 18], ['002', 'Mike', 19]]) # 多行同时写入，效果同上两次 writerow()
+
+    ☆ 这里写入完成后的csv文件可以以文本形式打开，也可以直接以Excel格式打开。
+
+    另一种写入方式：
+        字典格式写入
+
+        import csv
+        with open('data.csv', 'w', encoding='utf-8') as csvfile
+            fieldnames = ['id', 'name', 'age']          # 定义字段名（表头）
+            writer = csv.DictWriter(csvfile, fieldnames = fieldnames)   # 以字典格式写入
+            writer.writeheader()                        # 写入表头
+            writer.writerow({'id': '10001', 'name': 'Mike', 'age': 20})
+            writer.writerow({'id': '10002', 'name': 'Bob', 'age': 22})
+            
+    或者使用 pandas 库的 to_csv() 方法
+        import pandas as pd
+        dt.to_csv()                     # 默认 dt 是 DataFrame 的一个实例
+        dt.to_csv('data.csv')           # 相对路径
+        dt.to_csv('data.csv', sep=',')  # 分割字符
+            # 类似的 to_csv() 方法还有很多参数。    例如：指定格式、替换空值、保留索引等。
+
+读取 CSV 文件
+    1、导入csv库。
+    2、以读取方式打开一个csv文件。
+    3、调用csv库的reader()方法初始化读取对象Reader
+    4、遍历输出每行内容。每一行都是列表形式
+
+    例如：
+        import csv
+        with open('data.csv', 'r', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                print(row)
+
+    或者使用 pandas 库 的 read_csv() 方法
+        import pandas as pd
+        df = pd.read_csv('data.csv')
+        print(df)

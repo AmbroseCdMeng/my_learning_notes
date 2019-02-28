@@ -1,0 +1,69 @@
+﻿2018年9月30日09:32:11
+
+/*******  请求库的安装  ********/
+
+爬虫分为三步：抓取页面、分析页面、存储数据
+
+1、Python 安装 ……略
+2、request 请求库的安装
+	第一种 pip安装	pip3 Install requests
+
+				python -m pip instal --upgrade pip 	更新pip版本
+
+	第二种 wheel安装	pip3 install wheel	Python的一种安装包 后缀为 .whl
+		下载地址  https://pypi.org/project/wheel/
+
+	第三种 源码安装	下载源码后 Python setup.py install
+	
+3、selenium 安装	
+    自动化测试工具，利用它我们可以驱动浏览器执行特定的动作，如点击、下拉等操作，对于JS渲染的页面来说，这种抓取方式非常的有效
+
+	pip3 install selenium
+
+4、ChromeDriver 安装
+    selenium是自动化测试工具，需要浏览器配合使用，ChromeDriver是一个浏览器驱动
+	安装此驱动之前确认已经安装Chrome浏览器， 并查看对应版本
+	我的版本 	版本 69.0.3497.100（正式版本） （64 位）
+	
+	下载对应的ChromeDriver版本		http://npm.taobao.org/mirrors/chromedriver/
+
+	----------ChromeDriver v2.42 (2018-09-13)----------
+	Supports Chrome v68-70
+
+	所以我需要选择 ChromeDriver  2.42 版本
+	
+	下载完成后 建议 将exe文件放在 Python的 script 文件夹下	E:\Python\Python37-32\Scripts		也可以单独的为其配置环境变量
+
+	运行之 	Only local connections are allowed.  则说明安装成功
+
+	测试使用
+		from selenium import webdriver
+		browser =webdriver.Chrome()		会出现 “Chrome正在接受测试软件控制” 的字样
+
+5、GeckoDriver 安装
+    作用同4，这是Firefox 浏览器的驱动
+	下载地址 	https://github.com/mozilla/geckodriver/releases		tags 选择版本 download
+
+	Firefox	62.0.2 (64 位)
+
+6、PhantomJS 安装
+    作用同上，这是一个无界面可脚本变成的WebKit浏览器引擎，运行效率高，支持配置参数
+    Chrome的最新版本已经同样支持了无窗口浏览
+	下载地址   http://phantomjs.org/download.html
+
+    安装步骤同上
+		from selenium import webdriver
+		browser =webdriver.PhantomJS()
+		broser.get('http://www.baidu.com')	# 已经运行 但无窗口界面
+		print(browser.current_url)
+		
+7、aiohttp 安装
+
+    之前介绍的requests是一个阻塞式HTTP请求库，当我们发出一个请求时，程序会一直等待服务器的响应，直到响应后才会进行下一步操作
+    而aiohttp就是提供  异步  web服务的库
+	其操作借助  async/wait  关键字的写法变得更加简洁，异步请求进行数据抓取时，效率会大大的提升
+
+	pip3 install aiohttp
+
+	另外 官方还推荐同时安装两个 库
+		pip3 install cchardet aiodns		cchardet 字符编码检测库	aiodns DNS解析加速库

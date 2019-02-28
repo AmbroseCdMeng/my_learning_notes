@@ -1,0 +1,106 @@
+2018年11月14日21:09:25
+
+    数据爬取 -- 动态渲染页面的爬取 --  Splash 的 API 调用
+
+Splash API 调用
+
+    API 参考文档
+        https://splash.readthedocs.io/en/stable/api.html
+
+    render.html
+        该接口用于获取 JavaScript 渲染的页面的 HTML 代码
+        接口地址：
+            http://localhost:8050/render.html
+        参数说明：
+            url：指定渲染的 URL 
+            wait：等待时间。单位为秒。一般在网速较慢时为确保页面完全加载会设置等待
+        返回值：
+            返回页面渲染后的源代码
+        
+        接口示例：
+            http://localhost:8050/render.html?url=https://www.baidu.com
+        Python 代码示例：
+            import requests
+            url = 'http://localhost:8050/render.html?url=https://www.baidu.com'
+            response = requests.get(url)
+            print(response.text)
+
+        附件说明：
+            此接口还支持代理、图片加载、Headers、请求方式等多种设置
+        
+
+    render.png
+        该接口用于获取网页截图。
+        接口地址：
+            http://localhost:8050/render.png
+        参数说明：
+            url：指定渲染的 URL 
+            wait：等待时间。单位为秒。
+            width：宽度
+            height：高度
+        返回值：
+            返回 PNG 格式图片的二进制数据
+        Python 代码示例：
+            import requests
+            url = 'http://localhost:8050/render.html?url=https://www.jd.com&wait=5&width=1000&height=700'
+            response = requests.get(url)
+            with open('jingdong.png', 'wb') as f:
+                f.write(response.content)
+
+
+    render.jpeg
+        该接口用户获取网页截图。用法与 render.png 基本一样。
+        参数说明：
+            与 render.png 参数基本一致。多了一个参数。
+            quality：设置图片的质量
+
+    
+    render.har
+        该接口用户获取页面加载的 HAR 数据
+        接口地址：
+            http://localhost:8050/render.har
+        参数说明：
+            url：指定渲染的 URL 
+            wait：等待时间。单位为秒。
+        返回值：
+            返回 JSON 格式的数据。其中包含页面加载过程中的 HAR 数据。
+
+    render.json
+        该接口包含了前面所说的所有接口的功能。
+        接口地址：
+            http://localhost:8050/render.json
+        参数说明：
+            url：指定渲染的 URL 
+            wait：等待时间。单位为秒。
+            html：是否返回 HTML 数据。为 1 时返回
+            png：是否返回 png 数据。
+            har：是否返回 har 数据。
+            ...
+        返回值：
+            返回 JSON 格式的数据。
+        接口示例：
+            http://localhost:8050/render.json?url=https://www.jd.com&html=1&har=1
+
+
+    execute
+        该接口实现与 Splash Lua 脚本的对接。
+        接口地址：
+            http://localhost:8050/execute
+        参数说明：
+            lua_source：转码之后的 Splash Lua 脚本（需要转换成 URL 编码）
+        Python 示例：
+            # 我们使用 urllib.parse 模块中的 quote() 方法对 Lua 脚本进行转码
+            import requests
+            form urllib.parse import quote
+
+            lua = '''
+                function main(splash)
+                    return 'hello'
+                end
+            '''
+
+            url = 'http://localhost:8050/execute?lua_source=' + quote(lua)
+
+            response = requests.get(url)
+            print(response.text)
+            

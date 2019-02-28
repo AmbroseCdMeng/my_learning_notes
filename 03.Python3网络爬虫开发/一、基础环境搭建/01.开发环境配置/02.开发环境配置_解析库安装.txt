@@ -1,0 +1,71 @@
+﻿2018年9月30日10:28:04
+
+/*******  解析库的安装  ********/
+
+这里安装的库主要用于提取信息
+	我们可以利用正则直接提取，但是写起来相对比较繁琐
+
+1、lxm 安装
+lxml是Python的解析库之一，支持HTML和XML的解析，支持XPath解析方式，而且解析效率非常高。
+
+	pip3 install lxml
+
+2、Beautiful Soup 安装
+也是pthon的解析库之一，拥有强大的API和多样的解析方式
+	
+	pip3 install beautifulsoup4	4x是目前的最新版本
+
+	需要注意的是，我们虽然安装的时候是beautifulsoup4， 但是在引用的时候这个库的名字却是 bs4	简写
+
+3、pyquery 安装
+同上，也是Python的解析库之一，提供了和JQuery类似的语法来解析HTML文档，支持CSS选择器
+
+	pip3 install pyquery
+
+4、tesserocr 安装
+python的OCR识别库之一
+	OCR 即光学字符识别，是通过扫描字符，然后通过其形状将其翻译成电子文本，一般用于自动识别验证码
+
+	windows 中安装需要先下载 tesseract		★ 注意 ：tesserocr  和   tesseract    
+		tesseract   下载地址：https://digi.bib.uni-mannheim.de/tesseract/
+			其中 dev 为开发半 	不带 dev 为稳定版
+
+	我滴python 是32位的，所以这个玩意也要下载32位的
+				tesseract-ocr-setup-3.05.02-20180621.exe
+		双击安装
+	完成后
+	pip3 install tesserocr pillow
+
+	这里安装会遇到一些问题  建议参考文章  https://blog.csdn.net/coolcooljob/article/details/80385711
+
+	1.下载whl文件   地址 https://github.com/simonflueckiger/tesserocr-windows_build/releases
+		tesserocr-2.2.2-cp36-cp36m-win32.whl
+		
+	2.安装  pip3 install tesserocr-2.2.2-cp36-cp36m-win32.whl
+
+		★ 因版本不全 python 3.7 32位 的 windows 版本暂未更新   暂时安装失败  ***
+		https://github.com/simonflueckiger/tesserocr-windows_build/releases
+
+5、数据库安装
+	mysql  
+	mongOB	常见的非关系形数据库之一。是一个基于分布式文件存储的开源数据库系统。其存储的内容形式类似于Json对象，他的字段值可能包含其他文档，数组及文档数组，非常灵活。
+	
+	redis 是一个基于内存的高效 非关系型 数据库。（暂不安装）
+
+6、pymysql 安装
+	python 中与 mysql 数据库交互的 库
+		pip3 install pymysql
+
+7、pymongo安装     	
+	python 中与 mongoDB 数据库交互的 库
+		pip3 install pymongo
+
+8、redis-py 安装	
+	python 中与 redis 数据库交互的 库
+		pip3 install redis
+    redisDump
+	用于Redis数据导入/导出的同居，基于Ruby 实现的。所以安装之前需要先安装Ruby
+	安装参考 http://www.ruby-lang.org/zh_cn/documentation/installation
+	安装完后执行 gem install redis-dump 即可
+
+

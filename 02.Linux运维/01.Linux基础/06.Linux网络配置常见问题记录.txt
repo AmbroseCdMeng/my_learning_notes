@@ -1,0 +1,42 @@
+﻿2018年9月18日20:52:09
+
+链接参考文章 https://jingyan.baidu.com/article/75ab0bcbbbc630d6874db279.html
+
+1、网络配置常见问题记录
+
+	检查网卡设置: vim /etc/sysconfig/network-scripts/ifcfg-eth0 
+
+2、command not found
+
+	root权限问题或工作路径问题	  输入命令 su -
+
+3、设置网关：vim /etc/sysconfig/network 打开文件后添加GATEWAY=192.168.0.1
+
+
+4、设置DNS：vim /etc/resolv.conf 
+  	nameserver 8.8.8.8
+   	nameserver 8.8.4.4
+
+5、检查路由表 netstat -rn 
+	没有设置Gateway
+	 route add default gw 192.168.0.1
+
+6、ping: unknown hostwww.baidu.com
+	DNS配置错误或没有设置网关  具体操作 4、5步
+
+
+service network restart
+	重启网络服务
+
+
+
+★ 一般情况下。网络连接问题的检查步骤
+	1、ping 本机IP地址	检查本机IP分配是否正确
+	2、ping 网关地址	检查本机IP与网关是否连通
+	3、ping 其他内网地址	检查本机IP与内网其他机器是否连通
+	4、ping 公网地址	检查本机IP与公网是否连通
+	5、检查DND解析是否正常
+
+★★★ 主机中VM的DHCP和NAT服务需要启动
+
+
