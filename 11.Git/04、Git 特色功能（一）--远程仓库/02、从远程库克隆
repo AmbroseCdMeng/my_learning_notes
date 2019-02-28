@@ -28,3 +28,6 @@
         由于新建的远程库是空的， 我们第一次推送到 master 分支时 加了 -u 参数。
         这样 Git 不但会把本地的 master 分支内容推送到远程新的 master 分支，还会把本地 master 分支和远程 master 分支关联，简化以后推送和拉取的命令
     
+    以后， 只要本地做了提交（commit）， 就可以直接通过命令
+        git push origin master 
+    将 master 分支最新的修改同步到 GitHub 上了。
