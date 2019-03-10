@@ -1,0 +1,78 @@
+2019年2月26日13:58:17 
+
+
+JDK 动态代理
+
+
+JDK 动态代理是 java.lang.reflect.* 包提供的方式，它必须借助一个接口才能产生代理对象，所以需要先定义接口。
+
+    pubic interface HelloWorld{
+        public void sayHelloWorld();
+    }
+
+然后提供实现类 HelloWorldImpl 来实现接口
+
+    public class HelloWorldImpl implements HelloWorld{
+        @Override
+        pubic void sayHelloWorld(){
+            Syso...
+        }
+    }
+
+这是简单的 Java 接口和实现类的关系，此时就可以开始动态代理了，按照之前的分析，先要建立起代理对象和真实对象之间的关系，
+然后实现代理逻辑，所以一共分为两个步骤：
+    在 JDK 动态代理中，要实现代理逻辑必须去实现 java.lang.reflect.InvocationHandler 接口，它里面定义了一个 invoke 方法，
+并提供接口数组用于下挂代理对象
+
+    public class JdkProxyExample implements InvocationHandler{
+        //真实对象
+        private Object target = null;
+
+        /**
+        * 建立代理对象和真实对象的代理关系， 并返回代理对象
+        * @param target 真实对象
+        * @return 代理对象
+        */
+        public Object bind(Object target){
+            this.target = target;
+            return Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(), this);
+        }
+
+        /**
+        * 代理方法逻辑
+        * @param proxy 代理对象
+        * @param method 当前调度方法
+        * @param args 当前方法参数
+        * @return 代理结果返回
+        * @throws Throwables 异常
+        */
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable{
+            System.out.println("进入代理逻辑方法");
+            System.out.println("在调度真实对象之前的服务");
+            
+            //相当于调用 sayHelloWorld 方法
+            Object obj = method.invoke(target, args);
+            System.out.println("在调度真实对象之后的服务");
+            return obj;
+        }
+    }
+
+    第一步：建立代理对象和真实对象的关系。
+        这里是使用 bind 方法去完成的，方法里面首先用类的属性 target 保存了真实对象，然后通过 newProxyInstance 方法建立并生成真实对象。
+        其中 newProxyInstance 包含 3 个参数：
+            1.类加载器。采用了 target 本身的类加载器
+            2.把生成的动态代理对象挂在那些接口下。这里就是直接放在 target 实现的接口下。
+            3.定义实现方法逻辑的代理类。this 表示当前对象，它必须实现 InvocationHandler 接口的 invoke 方法，它就是代理逻辑方法的现实方法。
+
+    第二步：实现代理逻辑方法。
+        invoke 方法可以实现代理逻辑。
+        invoke 包含 3 个参数：
+            1.proxy，代理对象，就是 bind 方法生成的对象。
+            2.method，当前调度的方法
+            3.args，调度方法的参数
+        当使用代理对象调度方法后，就会进入到 invoke 方法里面
+
+    例比之前的例子：
+        proxy 相当于 商务对象； target 相当于 开发工程师 对象； bind 方法就是建立商务对象和开发工程师代理关系的方法；
+        invoke 就是商务逻辑，它将控制软件工程师的访问

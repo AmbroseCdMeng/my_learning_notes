@@ -1,0 +1,155 @@
+2019年1月16日11:17:59
+
+
+MyBatis 是一个基于 Java 的持久层框架。
+其优势在于灵活，几乎可以替代 JDBC ，同时也提供了接口编程。
+目前 MyBatis 的数据访问层 DAO（Data Access Object）是不需要实现类的。只需要一个接口和 XML（或注解）。
+MyBatis 提供自动映射、动态 SQL、级联、缓存、注解、代码和 SQL 分离等特性，使用方便，同时也可以对 SQL 进行优化。
+其主要特点：封装少、映射多样化、支持存储过程、可以进行 SQL 优化等。
+
+Hibernate 同为持久层框架。与 MyBatis 一样，都是依靠某种方法（如：XML），实现数据库的表和 POJO 映射关系的。
+
+实现 POJO 对象和数据库表相互映射的框架称之为对象关系映射（Object Relational Mapping， ORM）框架。
+
+MyBatis 与 Hibernate 最大的区别是： Hibernate 的设计理念是完全面向 POJO 的，基本不需要手动编写 SQL 就可以通过
+映射关系操作数据库，是一种全映射的体现。而 MyBatis 则需要手动提供 SQL 
+
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★  Hibernate： 适用于管理系统，侧重于业务逻辑，对性能不是很看重  
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+/* 映射文件 */
+
+<?xml version ＝ "l.0 "?>
+<!DOCTYPE hibernate - mapping PUBLIC "－ // Hibernate/Hibernate Mapping DTD 3.0//EN " "http://www.hibernate.org/dtd/hibernate- mapping- 3 . 0 . dtd ">
+<hibernate-mapping>
+    <class name = "com.learn . chapterl.pojo . Role "table = "t role">
+        <id name ="id "type= "j ava . lang . Integer ">
+            <column name= "id"/>
+            <generator class ="identity"/>
+        </id>
+        <property name ＝ "roleName "type ＝ "stri 口q "〉
+            <column name= "role_name "length ＝ "6 。"not - null ＝ "true "／〉
+        </property>
+        <property name= "note "type= "string ">
+            <column name = "note "length= "512 "/>
+        </property>
+    </class>
+</hibernate - mapping>
+
+
+/* 操作数据库 */
+
+Session session = null;
+Transaction tx = null;
+try{
+    session = HibernateUtil.getSessionFactory().openSessoin();  //打开 Session
+    tx = session.beginTransaction();
+    //  POJP  //
+    Role role = new Role();
+    session.save(role);             //保存
+    session.get(Role.class, 1)      //查询
+    session.update(role);           //修改
+    session.delete(role);           //删除 
+    tx.commit();                    //提交事务
+} catch (Exception ex){
+    if(tx != null && tx.isActive()){
+        tx.rollback();              //回滚事务
+    }
+} finally {
+    if(session != null && session.isOpen()){
+        session.close();
+    }
+}
+
+
+
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★  MyBatis： 自定义 SQL 生成规则，精准定义进而优化性能。适合高并发、大数据、高性能、高响应的系统  
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+/* 映射文件 */
+
+<?xml version ＝ "1.0"encoding ＝ "UTF-8"?>
+< !DOCTYPE mapper PUBLIC "－//mybatis.org//DTD Mapper 3.0//EN" "http: //mybatis .org/dtd/mybatis-3-mapper.dtd " >
+<mapper namespace= "com.learn.chapterl.mapper.RoleMapper ">
+    <resultMap id= "roleMap " type = "com.learn.chapterl.pojo.Role ">
+        <id property="id"column="id "/>
+        <result property="roleName "column= "role_name"/>
+        <result property="note" column= "note"/>
+    </resultMap>
+    <select id="getRole" resultMap= "roleMap">
+        select id, rolename , note from t_role where id = #{id}
+    </select>
+    <delete id = "deleteRole" parameterType ="int">
+        delete from t_role where id = #{id}
+    </delete>
+    <insert id ="insertRole" parameterType = "com.learn.chapterl.pojo.Role ">
+        insert into t_role(rolename , note) values(#{roleName} , #{note})
+    </insert>
+    <update id="updateRole "parameterType= "com.learn.chapterl.pojo.Role ">
+        update t_role set rolename= #{roleName}, note = #{note} where id = #{id}
+    </update>   
+</mapper>
+
+☆ 配置文件中：mapper 的 namespace 属性和接口的全限定名保持一致；SQL 的 id 与接口定义的方法名保持一致
+
+
+
+/* 接口 定义 */
+
+package com.learn.chapterl.mapper;
+import com.learn.chapterl.pojo.Role ;
+public interface RoleMapper{
+    public Role getRole(Integer id);
+    public int deleteRole(Integer id);
+    public int insertRole(Role role);
+    public int updateRole(Role role);
+}
+
+☆ 定义映射文件接口。并不需要实现类。
+
+
+/* 操作数据库 */
+
+SqlSession sqlSession = null;
+try{
+    sqlsession = MyBatisUtil.getSqlSession();
+    RoleMapper roleMapper = sqlSession.getMapper(RoleMapper.class);
+    Role role = roleMapper.getRole(1);      //查询
+    roleMapper.updateRole(role);            //更新
+    roleMapper.insertRole(role);            //插入
+    roleMapper.delete(2);                   //删除
+    sqlsession.commit();
+} catch(Exception ex){
+    if(sqlSession != null){
+        sqlSession.rollback();
+    }
+} finally{
+    if(sqlSession != null){
+        sqlSession.close();
+    }
+}
+
+
+
+
+
+Hibernate 和 MyBatis 的区别
+
+
+Hibernate 和 MyBatis 的增、删、改、查，对于业务逻辑层来说大同小异。
+对于映射层而言。Hibernate 的配置不需要借口和 SQL；相反，MyBatis 是需要的。
+
+Hibernate 不需要编写大量的 SQL 就可以完全映射。同时提供了日志、缓存、级联（比 MyBatis 更强大）
+此外，还提供了 HQL（Hibernate Query Language）对 POJO 进行操作。
+但其致命缺陷就是性能。
+当多表关联的时候，通过 Hibernate 的级联会造成太多性能的丢失；
+当关联字段只能根据特定的条件变化而变化，Hibernate 无法支持这样的变化；
+当遇到存储过程时，Hibernate 也只能作罢。
+
+MyBatis 可以自由书写 SQL，支持动态 SQL，处理列表，动态生成表名、支持存储过程

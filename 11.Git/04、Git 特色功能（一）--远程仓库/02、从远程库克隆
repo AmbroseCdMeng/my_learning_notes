@@ -13,9 +13,9 @@
 接下来， 在本地 git 仓库下执行 ：
     git remote add origin git@github.com:用户名/远程仓库名.git
 
-    其中 origin 是远程库的名字，可以修改为自定义的名称。但一般没有必要修改 这是 Git 默认的叫法
+    其中 origin 是远程库的别名，就是后面 github 下指定用户的远程仓库名的别称，可以修改为自定义的名称。但一般没有必要修改 这是 Git 默认的叫法
     用户名 是 GitHub 的用户名
-    本地仓库名 是 准备关联的本地文件夹名称
+    远程仓库名 是 准备关联的远程仓库名名称
 
     F:\108.Notes>git remote add origin git@github.com:AmbroseCdMeng/my_learning_notes.git
 

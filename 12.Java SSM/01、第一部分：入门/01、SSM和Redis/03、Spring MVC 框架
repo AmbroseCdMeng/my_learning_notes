@@ -1,0 +1,8 @@
+2019年1月17日9:10:39
+
+
+Spring MVC 框架。
+
+Struts2 与 Spring 的结合一直存在很多的问题。如兼容性问题和类臃肿。加上今年来 Struts2 漏洞频发，导致使用率大减。
+Spring MVC 是生于 Spring Web 项目的 MVC 框架。
+Spring MVC 结构层次清晰，类比较简单，并且与 Spring 的核心 IOC 和 AOP 无缝对接。

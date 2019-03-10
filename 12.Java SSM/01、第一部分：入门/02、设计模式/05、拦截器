@@ -1,0 +1,47 @@
+2019年2月28日14:31:44
+
+
+拦截器
+
+由于动态代理比较难理解，程序设计者会设计一个拦截器接口以供开发者使用
+开发者只需要知道拦截器接口的方法、含义和作用即可。
+
+public interface Interceptor{
+    
+    public boolean before(Object proxy, Object target, Method method, Object[] args);
+
+    public void around(Object proxy, Object target, Method method, Object[] args);
+
+    public void after(Object proxy, Object target, Method method, Object[] args);
+}
+
+这里定义的参数分别是：
+    proxy：代理对象
+    target：真实对象
+    method：方法
+    args：运行方法参数
+
+before
+    在真实对象前调用。 返回 true 时， 则反射真实对象的方法； 返回 false 时， 则调用 around 方法
+around
+    当 before 返回 false， 即不反射被代理对象的原有方法时， 执行 around 方法取代被代理对象的方法
+after
+    在反射真实对象方法或者 around 方法执行之后调用
+
+
+实现 Interceptor 类
+public class MyInterceptor implements Interceptor{
+    @override
+    public boolean beform(Object proxy, Object target, Method method, Object[] args){
+        System.err.println("反射方法前逻辑");
+        return false; //不反射被代理对象的方法
+    }
+    @override
+    public void after(Object proxy, Object target, Method method, Object[] args){
+        System.err.println("反射方法后逻辑");
+    }
+    @override
+    public void around(Object proxy, Object target, Method method, Object[] args){
+        System.err.println("取代了被代理对象的方法");
+    }
+}
