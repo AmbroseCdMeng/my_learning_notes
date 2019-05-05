@@ -1,0 +1,45 @@
+2019年5月5日13:51:28
+
+分支实际使用的场景
+
+    一、Bug 分支
+
+        开发中，修复 bug 是最常见的工作。
+        为了管理方便并且不影响源代码，修复 bug 最稳妥的办法就是创建分支、修复、合并分支、删除分支。
+
+        但是，有时候，在 p1 分支上的工作还没有结束，无法 commit。
+        此时，可以通过 git stash 命令，先保存之前的工作区
+            git stash
+            Saved working directory and index state WIP on dev: f52c633 add merge
+        
+        此时 git status 可以看到，工作区已经变为空白了。
+
+        然后切换到需要修复 bug 的分支上，创建临时分支 bug01
+        修复、合并、删除分支
+
+        这时候，切换到 p1 分支准备继续工作。可现实的工作区在刚才 commit 了 bug 修复的代码后又是空白的。
+        如何恢复到之前的工作区？
+
+            git stash list 查看保存的工作区列表
+                git stash list
+                stash@{0}: WIP on dev: f52c633 add merge
+
+            git stash apply 恢复工作区
+            git stash drop  删除工作区
+
+            git stash pop   恢复并删除工作区
+
+        如果 git stash list 有多个工作区列表
+        则需要在上面 3 个命令后加上 stash 的 id。如： git stash apply stash@{0}
+    
+
+
+
+    二、功能分支
+
+        第二种最常用的场景就是新功能需求。
+        
+        创建并切换新分支 feature01 
+        开发新功能、合并、删除。
+        
+        如果特殊情况（比如功能突然不需要了），在未合并的情况下删除，需要加 -D 参数强制删除

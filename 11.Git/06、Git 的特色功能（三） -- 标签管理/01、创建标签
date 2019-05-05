@@ -1,0 +1,38 @@
+2019年5月5日14:09:07
+
+Git 标签介绍
+
+    Git 的标签其实就相当于一个版本的快照，作用于 commit 无二。
+    最大的优点就是可以自定义名称。
+        比如：对 commit 号码为 46147da345fd54a........ 的版本创建一个标签为 v1.1.1 的版本号。
+
+
+标签创建
+    1、切换到需要创建标签的分支上
+        git checkout p1
+    2、创建一个标签
+        git tag v1.0
+        或  git tag -a v1.0 -m "mark message"
+    3、查看所有标签（按照字母排序）
+        git tag
+    
+    默认的标签是创建在最新的 commit 上的。
+    如果要对历史 commit 创建标签，则需要使用 git log 找到对应的历史 commit id
+    然后 git tag v1.1 147da345fd54a......
+
+    4、查看指定标签
+        git show v1.1
+
+
+删除标签（标签默认只会存储在本地，不会自动 push 到远程）    
+    删除本地标签
+        git tag -d v1.1
+    删除远程标签（需要先删除本地标签）
+        git push origin :refs/tages/v1.1
+    
+
+推送标签到远程
+    推送指定标签
+        git push origin v1.1    
+    推送所有标签（为推送的标签）
+        git push origin --tags

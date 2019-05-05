@@ -1,0 +1,18 @@
+2019年2月28日21:52:27
+
+
+从远程库克隆
+
+
+从远程库克隆使用 git clone 命令
+
+    git clone git@github.com:username/repositioriesname.git
+        其中：   
+            username 为 github 的用户名
+            repositoriesname 为 github 的仓库名
+
+    
+    实际上，github 的地址不止一个。
+        默认使用的 ssh 协议。
+        也可以修改为 https://github.com 
+            但是 https 协议除了速度慢以外，每次push都需要输入口令，比较麻烦。
