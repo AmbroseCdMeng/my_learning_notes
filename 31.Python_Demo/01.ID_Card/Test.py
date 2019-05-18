@@ -16,10 +16,10 @@ class Test:
         idcard = IdCardCheck(username, password, tns)
 
         # 搜索参数
-        districtNo = "620600"
-        birth_year = ['1994']
-        birth_month = [8]
-        birth_day = [17]
+        districtNo = "622826"
+        birth_year = ['1995']
+        birth_month = [10]
+        birth_day = [26]
         sex = [1]
 
         return idcard.start_search(districtNo, birth_year, birth_month, birth_day, sex)
